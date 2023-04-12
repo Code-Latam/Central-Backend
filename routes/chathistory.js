@@ -1,14 +1,13 @@
 const router = require("express").Router();
 const bcrypt = require("bcrypt");
-const axios = require('axios');
 const dotenv = require("dotenv");
 dotenv.config();
 var base_url = process.env.BASE_CONFIG_URL ;
 
-//REGISTER USER
-router.post("/register", async (req, res) => {
+// Query chathistory based on period and result
+router.post("/queryperiod", async (req, res) => {
   try {
-    const url = base_url + "/api/auth/register"
+    const url = base_url + "/api/chathistory/queryperiod";
     const response = await fetch(url, {
       method: 'POST',
       headers: {
@@ -23,10 +22,10 @@ router.post("/register", async (req, res) => {
   }
 })
 
-//LOGIN USER
-router.post("/login", async (req, res) => {
+// Query to count chathistory based on period and result
+router.post("/queryperiodcount", async (req, res) => {
   try {
-    const url = base_url + "/api/auth/login"
+    const url = base_url + "/api/chathistory/queryperiodcount";
     const response = await fetch(url, {
       method: 'POST',
       headers: {
@@ -40,7 +39,6 @@ router.post("/login", async (req, res) => {
     res.status(500).json(err)
   }
 })
-
 
 
 module.exports = router;

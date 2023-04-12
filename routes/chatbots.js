@@ -1,6 +1,5 @@
 const router = require("express").Router();
 const bcrypt = require("bcrypt");
-const axios = require('axios');
 const dotenv = require("dotenv");
 dotenv.config();
 var base_url = process.env.BASE_CONFIG_URL ;
@@ -17,7 +16,7 @@ router.post("/register", async (req, res) => {
       body: JSON.stringify(req.body)
     });
     const myresponse = await response.json();
-    res.status(200).json(myresponse);
+    res.status(response.status).json(myresponse);
   } catch (err) {
     res.status(500).json(err)
   }
@@ -34,7 +33,7 @@ router.post("/query", async (req, res) => {
       body: JSON.stringify(req.body)
     });
     const myresponse = await response.json();
-    res.status(200).json(myresponse);
+    res.status(response.status).json(myresponse);
   } catch (err) {
     res.status(500).json(err)
   }
@@ -52,7 +51,7 @@ router.post("/queryall", async (req, res) => {
       body: JSON.stringify(req.body)
     });
     const myresponse = await response.json();
-    res.status(200).json(myresponse);
+    res.status(response.status).json(myresponse);
   } catch (err) {
     res.status(500).json(err)
   }
@@ -71,7 +70,7 @@ router.post("/delete", async (req, res) => {
       body: JSON.stringify(req.body)
     });
     const myresponse = await response.json();
-    res.status(200).json(myresponse);
+    res.status(response.status).json(myresponse);
   } catch (err) {
     res.status(500).json(err)
   }
@@ -89,7 +88,7 @@ router.post("/update", async (req, res) => {
       body: JSON.stringify(req.body)
     });
     const myresponse = await response.json();
-    res.status(200).json(myresponse);
+    res.status(response.status).json(myresponse);
   } catch (err) {
     res.status(500).json(err)
   }

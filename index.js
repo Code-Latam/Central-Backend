@@ -7,6 +7,8 @@ const multer = require("multer");
 
 const chatbotRoute = require("./routes/chatbots");
 const authRoute = require("./routes/auth");
+const userRoute = require("./routes/users");
+const chathistoryRoute = require("./routes/chathistory");
 
 const router = express.Router();
 const path = require("path");
@@ -41,6 +43,8 @@ app.post("/api/upload", upload.single("file"), (req, res) => {
 
 app.use("/api/chatbots", chatbotRoute);
 app.use("/api/auth", authRoute);
+app.use("/api/users", userRoute);
+app.use("/api/chathistory", chathistoryRoute);
 
 app.listen(9000, () => {
   console.log("Central Backend server is running on port " + "9000!");
