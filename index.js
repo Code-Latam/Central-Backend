@@ -59,6 +59,7 @@ app.use("/api/users", userRoute);
 app.use("/api/chathistory", chathistoryRoute);
 app.use("/api/chat", chatRoute);
 
-app.listen(10000, () => {
-  console.log("Central Backend server is running on port " + "10000!");
+const port = process.env.PORT || 10000
+app.listen(port, () => {
+  console.log("Central Backend server is running on port " + port);
 });

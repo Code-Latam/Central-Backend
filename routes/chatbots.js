@@ -77,6 +77,24 @@ router.post("/delete", async (req, res) => {
 })
 
 //delete chatbot
+router.post("/test", async (req, res) => {
+  try {
+    const url = base_url + "/api/chatbots/test";
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(req.body)
+    });
+    const myresponse = await response.json();
+    res.status(response.status).json(myresponse);
+  } catch (err) {
+    res.status(500).json(err)
+  }
+})
+
+//Update chatbot
 router.post("/update", async (req, res) => {
   try {
     const url = base_url + "/api/chatbots/update";
