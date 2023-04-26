@@ -13,7 +13,7 @@ const corsOptions = {
 }
 
 
-
+const clientRoute = require("./routes/clients");
 const chatbotRoute = require("./routes/chatbots");
 const authRoute = require("./routes/auth");
 const userRoute = require("./routes/users");
@@ -53,6 +53,7 @@ app.post("/api/upload", upload.single("file"), (req, res) => {
   }
 });
 
+app.use("/api/clients", clientRoute);
 app.use("/api/chatbots", chatbotRoute);
 app.use("/api/auth", authRoute);
 app.use("/api/users", userRoute);
