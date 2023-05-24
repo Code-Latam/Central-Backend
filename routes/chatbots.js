@@ -149,5 +149,41 @@ router.post("/adddocs", async (req, res) => {
   }
 })
 
+//add URL pages to chatbot
+router.post("/addurl", async (req, res) => {
+  try {
+    const url = base_url + "/api/chatbots/addurl";
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(req.body)
+    });
+    const myresponse = await response.json();
+    res.status(response.status).json(myresponse);
+  } catch (err) {
+    res.status(500).json(err)
+  }
+})
+
+//add URL pages to chatbot
+router.post("/crawl", async (req, res) => {
+  try {
+    const url = base_url + "/api/chatbots/crawl";
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(req.body)
+    });
+    const myresponse = await response.json();
+    res.status(response.status).json(myresponse);
+  } catch (err) {
+    res.status(500).json(err)
+  }
+})
+
 
 module.exports = router;

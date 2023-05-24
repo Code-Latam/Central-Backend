@@ -1,0 +1,199 @@
+
+<html>
+<head>
+<style>
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+
+
+body {
+  background-color: #f0f0f0;
+}
+
+h1 {
+  color: #333;
+}
+
+.container {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.page {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: left; /* align the panels to the left */
+  gap: 10px; /* add some gap between the panels */
+}
+
+.panel {
+  border: 4px solid #333; /* make the borders thicker and dark grey */
+  padding: 10px;
+  width: calc(50% - 10px); /* subtract the gap size from the width */
+  border-radius: 10px; /* add some round corners */
+}
+
+.panel-a {
+  border-color: darkgrey;
+  height: 300px;
+}
+
+.panel-a h2 {
+  margin-top: 0;
+}
+
+.panel-b {
+  border-color: darkgrey;
+  height: 300px; /* set a fixed height for panel B */
+  overflow-y: scroll; /* make panel B scrollable */
+}
+
+
+.panel-c {
+  border-color: darkgray;
+  overflow-y: scroll; /* make panel C scrollable */
+}
+
+.panel-c h2 {
+  margin-top: 0;
+}
+
+.panel-d {
+  border-color: darkgrey;
+  height: 400px;
+  overflow-y: scroll;
+}
+
+input[type=text] {
+  border: 2px solid #ccc;
+  padding: 15 px;
+  width: 300px;
+}
+
+input[type=submit] {
+  background-color: #333;
+  color: white;
+  cursor: pointer;
+}
+
+input[type=submit]:hover {
+  background-color: #555;
+}
+
+/* Use a flexbox layout for the panel C */
+.panel-c form {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Use a custom class for the submit button wrapper */
+.submit-button {
+  display: flex;
+  justify-content: flex-end; /* align the button to the right */
+}
+
+/* Use a custom class for the input fields wrapper */
+.input-fields {
+  display: flex;
+  flex-direction: column;
+  
+}
+</style>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+
+
+<div class="container">
+<div class="page">
+<div class="panel panel-a">
+<h2>Description</h2>
+<p>This is the API endpoint that allows you to query information about a chatbot. Chatbot must habe been previously registered using the Register Chatbot api</p>
+<p>The URL is https://central-backend-bots.azurewebsites.net/api/chatbots/query</p>
+</div>
+<div class="panel panel-b" id="curl">
+<!-- The curl statement will be displayed here -->
+<pre>curl -X POST \
+https://central-backend-bots.azurewebsites.net/api/chatbots/query \
+-H 'Content-Type: application/json' \
+-d '{
+"clientNr": "55555",
+"gwoken" : "saasasasas",
+"chatbotMaster": "chatbot1",
+"chatbotKey" : "chatbot1"
+}'
+</pre>
+</div>
+<div class="panel panel-c">
+<h2>Parameter Fields</h2>
+<form id="form">
+<div class="input-fields"> <!-- wrap the input fields with a div -->
+<div>The clientNr is a unique identifier for each client.</div>
+<input type="text" id="clientNr" name="clientNr" value="55555"><br>
+<div>The gwoken is a secret token that authenticates the client.</div>
+<input type="text" id="gwoken" name="gwoken" value="saasasasas"><br>
+<div>The chatbotMaster is the name of the chatbot that handles the queries.</div>
+<input type="text" id="chatbotMaster" name="chatbotMaster" value="chatbot1"><br>
+<div>The chatbotKey is a secret key that authenticates the chatbot.</div>
+<input type="text" id="chatbotKey" name="chatbotKey" value="chatbot1"><br>
+</div>
+<div class="submit-button">
+<input type="submit" value="submit">
+</div>
+</form>
+</div>
+<div class="panel panel-d" id="results">
+<!-- The results of the API request will be displayed here -->
+</div>
+</div>
+</div>
+
+<script>
+// get the form element
+var form = document.getElementById("form");
+
+// add an event listener to handle the form submission
+form.addEventListener("submit", function(event) {
+  // prevent the default form action
+  event.preventDefault();
+
+  // get the form data as an object
+  var data = {};
+  var inputs = form.querySelectorAll("input");
+  for (var i = 0; i < inputs.length; i++) {
+    data[inputs[i].name] = inputs[i].value;
+  }
+
+  // make a POST request to the API with the data
+  fetch("https://central-backend-bots.azurewebsites.net/api/chatbots/query", {
+    method: "POST",
+    body: JSON.stringify(data),
+    headers: {
+      "Content-Type": "application/json"
+    }
+  })
+    .then(function(response) {
+      // return the response as JSON
+      return response.json();
+    })
+    .then(function(json) {
+      // display the response as a JSON object
+      document.getElementById("results").innerHTML = JSON.stringify(json, null, 2);
+
+      // generate and display the curl statement with the data
+      var curl = "curl -X POST \\\n";
+      curl += "https://central-backend-bots.azurewebsites.net/api/chatbots/query \\\n";
+      curl += "-H 'Content-Type: application/json' \\\n";
+      curl += "-d '" + JSON.stringify(data) + "'";
+      document.getElementById("curl").innerHTML = "<pre>" + curl + "</pre>";
+    })
+    .catch(function(error) {
+      // handle any errors
+      console.error(error);
+    });
+});
+</script>
+</body>
+</html>

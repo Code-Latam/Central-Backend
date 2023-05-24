@@ -19,6 +19,7 @@ const authRoute = require("./routes/auth");
 const userRoute = require("./routes/users");
 const chathistoryRoute = require("./routes/chathistory");
 const chatRoute = require("./routes/chat");
+const uploadRoute = require("./routes/upload");
 
 const router = express.Router();
 const path = require("path");
@@ -35,23 +36,8 @@ app.use(morgan("common"));
 // use the cors middleware
 app.use(cors(corsOptions));
 
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, "public/images");
-  },
-  filename: (req, file, cb) => {
-    cb(null, req.body.name);
-  },
-});
 
-const upload = multer({ storage: storage });
-app.post("/api/upload", upload.single("file"), (req, res) => {
-  try {
-    return res.status(200).json("File uploded successfully");
-  } catch (error) {
-    console.error(error);
-  }
-});
+
 
 app.use("/api/clients", clientRoute);
 app.use("/api/chatbots", chatbotRoute);
@@ -59,6 +45,7 @@ app.use("/api/auth", authRoute);
 app.use("/api/users", userRoute);
 app.use("/api/chathistory", chathistoryRoute);
 app.use("/api/chat", chatRoute);
+app.use("/api/upload", uploadRoute);
 
 const port = process.env.PORT || 10000
 app.listen(port, () => {
