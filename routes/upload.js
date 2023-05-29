@@ -26,7 +26,7 @@ const upload = multer({ storage: storage });
 router.post("/multiple-upload", upload.array("file", 50), (req, res) => {
   // Handle the API call here
   const loader = new DirectoryLoader(
-    "Upload/",
+    "upload/",
     {
       ".json": (path) => new JSONLoader(path),
       ".txt": (path) => new TextLoader(path),
