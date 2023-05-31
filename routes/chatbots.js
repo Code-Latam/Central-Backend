@@ -39,6 +39,24 @@ router.post("/query", async (req, res) => {
   }
 })
 
+// Get master chatbot
+router.post("/getmaster", async (req, res) => {
+  try {
+    const url = base_url + "/api/chatbots/getmaster";
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(req.body)
+    });
+    const myresponse = await response.json();
+    res.status(response.status).json(myresponse);
+  } catch (err) {
+    res.status(500).json(err)
+  }
+})
+
 // Get base config info for all chatbot
 router.post("/queryall", async (req, res) => {
   try {
