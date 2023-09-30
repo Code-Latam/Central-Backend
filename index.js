@@ -20,6 +20,7 @@ const userRoute = require("./routes/users");
 const chathistoryRoute = require("./routes/chathistory");
 const chatRoute = require("./routes/chat");
 const uploadRoute = require("./routes/upload");
+const workflowRoute = require("./routes/workflows");
 
 const router = express.Router();
 const path = require("path");
@@ -46,6 +47,7 @@ app.use("/api/users", userRoute);
 app.use("/api/chathistory", chathistoryRoute);
 app.use("/api/chat", chatRoute);
 app.use("/api/upload", uploadRoute);
+app.use("/api/workflow", workflowRoute);
 
 const port = process.env.PORT || 10000
 app.listen(port, () => {
