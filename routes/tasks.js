@@ -4,10 +4,10 @@ const dotenv = require("dotenv");
 dotenv.config();
 var base_url = process.env.BASE_CONFIG_URL ;
 
-// Register workflow
+// Register product
 router.post("/register", async (req, res) => {
   try {
-    const url = base_url + "/api/workflow/register"
+    const url = base_url + "/api/task/register"
     const response = await fetch(url, {
       method: 'POST',
       headers: {
@@ -25,7 +25,7 @@ router.post("/register", async (req, res) => {
 //Update Workflow
 router.post("/update", async (req, res) => {
   try {
-    const url = base_url + "/api/workflow/update";
+    const url = base_url + "/api/task/update";
     const response = await fetch(url, {
       method: 'POST',
       headers: {
@@ -43,7 +43,7 @@ router.post("/update", async (req, res) => {
 //delete workflow
 router.post("/delete", async (req, res) => {
   try {
-    const url = base_url + "/api/workflow/delete";
+    const url = base_url + "/api/task/delete";
     const response = await fetch(url, {
       method: 'POST',
       headers: {
@@ -62,7 +62,7 @@ router.post("/delete", async (req, res) => {
 // Get One workflow
 router.post("/query", async (req, res) => {
   try {
-    const url = base_url + "/api/workflow/query";
+    const url = base_url + "/api/task/query";
     const response = await fetch(url, {
       method: 'POST',
       headers: {
@@ -78,28 +78,9 @@ router.post("/query", async (req, res) => {
 })
 
 // Get workflows given a product
-router.post("/queryallgivenproduct", async (req, res) => {
-  try {
-    const url = base_url + "/api/workflow/queryallgivenproduct";
-    const response = await fetch(url, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(req.body)
-    });
-    const myresponse = await response.json();
-    res.status(response.status).json(myresponse);
-  } catch (err) {
-    res.status(500).json(err)
-  }
-})
-
-
-// Get all clients
 router.post("/queryall", async (req, res) => {
   try {
-    const url = base_url + "/api/workflow/queryall";
+    const url = base_url + "/api/task/queryall";
     const response = await fetch(url, {
       method: 'POST',
       headers: {
@@ -113,61 +94,6 @@ router.post("/queryall", async (req, res) => {
     res.status(500).json(err)
   }
 })
-
-
-//Query All graphs
-router.post("/queryallgraphs", async (req, res) => {
-  try {
-    const url = base_url + "/api/workflow/queryallgraphs";
-    const response = await fetch(url, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(req.body)
-    });
-    const myresponse = await response.json();
-    res.status(response.status).json(myresponse);
-  } catch (err) {
-    res.status(500).json(err)
-  }
-})
-
-router.post("/queryallgraphsgivenproduct", async (req, res) => {
-  try {
-    const url = base_url + "/api/workflow/queryallgraphsgivenproduct";
-    const response = await fetch(url, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(req.body)
-    });
-    const myresponse = await response.json();
-    res.status(response.status).json(myresponse);
-  } catch (err) {
-    res.status(500).json(err)
-  }
-})
-
-router.post("/queryonegraph", async (req, res) => {
-  try {
-    const url = base_url + "/api/workflow/queryonegraph";
-    const response = await fetch(url, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(req.body)
-    });
-    const myresponse = await response.json();
-    res.status(response.status).json(myresponse);
-  } catch (err) {
-    res.status(500).json(err)
-  }
-})
-
-
 
 
 module.exports = router;
