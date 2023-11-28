@@ -4,7 +4,7 @@ const dotenv = require("dotenv");
 dotenv.config();
 var base_url = process.env.BASE_CONFIG_URL ;
 
-// Register product
+// Register products
 router.post("/register", async (req, res) => {
   try {
     console.log("arrived");
