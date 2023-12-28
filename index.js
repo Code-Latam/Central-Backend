@@ -20,12 +20,17 @@ const userRoute = require("./routes/users");
 const chathistoryRoute = require("./routes/chathistory");
 const chatRoute = require("./routes/chat");
 const uploadRoute = require("./routes/upload");
+const uploadapidefRoute = require("./routes/uploadapidef");
+const uploadapidef2Route = require("./routes/uploadapidef2");
+
 const explorerRoute = require("./routes/explorers");
 const workflowRoute = require("./routes/workflows");
 const productRoute = require("./routes/products");
 const taskRoute = require("./routes/tasks");
 const apiRoute = require("./routes/apis");
 const linkRoute = require("./routes/links");
+const apiimportRoute = require("./routes/apiimport");
+const relayRoute = require("./routes/relay");
 
 const router = express.Router();
 const path = require("path");
@@ -34,6 +39,7 @@ dotenv.config();
 console.log(process.env.MONGO_URL);
 
 app.use("/images", express.static(path.join(__dirname, "public/images")));
+app.use(express.static(path.join(__dirname, "public")));
 
 //middleware
 app.use(express.json());
@@ -52,12 +58,16 @@ app.use("/api/users", userRoute);
 app.use("/api/chathistory", chathistoryRoute);
 app.use("/api/chat", chatRoute);
 app.use("/api/upload", uploadRoute);
+app.use("/api/uploadapidef", uploadapidefRoute);
+app.use("/api/uploadapidef2", uploadapidef2Route);
 app.use("/api/explorer", explorerRoute);
 app.use("/api/workflow", workflowRoute);
 app.use("/api/product", productRoute);
 app.use("/api/task", taskRoute);
 app.use("/api/api", apiRoute);
 app.use("/api/link", linkRoute);
+app.use("/api/apiimport", apiimportRoute);
+app.use("/api/relay", relayRoute);
 
 const port = process.env.PORT || 10000
 app.listen(port, () => {
