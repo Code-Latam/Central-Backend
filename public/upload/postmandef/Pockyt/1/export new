@@ -1,0 +1,1673 @@
+{
+	"info": {
+		"_postman_id": "caf52a9e-0c53-4e2b-b4d4-c2bbdd3ca821",
+		"name": "export test",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "25749966",
+		"_collection_link": "https://red-comet-433941.postman.co/workspace/POCKYT-Work-Space~a7046763-adde-4d20-8d27-90a99eab112a/collection/25749966-caf52a9e-0c53-4e2b-b4d4-c2bbdd3ca821?action=share&source=collection_link&creator=25749966"
+	},
+	"item": [
+		{
+			"name": "PAYOUTS",
+			"item": [
+				{
+					"name": "Retrieve Payee",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"var crypto = require('crypto-js')\r",
+									"var MyTimestamp = (new Date(new Date().toString().split('GMT')[0]).toISOString().split('.')[0]);\r",
+									"\r",
+									"var rawBody = pm.request.body.raw;\r",
+									"const requestBody = JSON.parse(rawBody);\r",
+									"\r",
+									"var myPOSParamObject = {\r",
+									"    merchantNo: pm.collectionVariables.get('merchantNo'),\r",
+									"    storeNo: pm.collectionVariables.get('storeNo'),\r",
+									"    customerNo: requestBody.customerNo,\r",
+									"    timestamp: requestBody.timestamp\r",
+									"    \r",
+									"}\r",
+									"\r",
+									"// Calculate the VeriSign signature:\r",
+									"\r",
+									"var MySignature = CalculateSignature(pm.collectionVariables.get('MyToken'), myPOSParamObject);\r",
+									"\r",
+									"postman.setEnvironmentVariable(\"merchantNo\", myPOSParamObject.merchantNo);\r",
+									"postman.setEnvironmentVariable(\"storeNo\", myPOSParamObject.storeNo);\r",
+									"postman.setEnvironmentVariable(\"MySignature\", MySignature);\r",
+									"\r",
+									"// function that calculates the signature according to Pockyt rules\r",
+									"function CalculateSignature(token,parameters)\r",
+									"{\r",
+									"    // calculate the hash value of the token\r",
+									"    \r",
+									"    // var ApiTokenHashvalue = CryptoJS.MD5(str_1 + str_2).toString();\r",
+									"    var ApiTokenHashvalue = crypto.MD5(token).toString();\r",
+									"    \r",
+									"    // order parameters alfabetically\r",
+									"    var SortedParams = sortObj(parameters);\r",
+									"    \r",
+									"    // Concatenate: add '&' between key and value pair and replace : for = \r",
+									"    var MyString = '' ;\r",
+									"    for (const [key, value] of Object.entries(SortedParams)) {\r",
+									"        MyString += (`${key}=${value}&`);}\r",
+									"\r",
+									"    //  add hash value of token at the and of the string\r",
+									"    MyString += ApiTokenHashvalue ;\r",
+									"\r",
+									"    // create the verifySign\r",
+									"\r",
+									"    const MySignature = crypto.MD5(MyString).toString();\r",
+									"\r",
+									"    return MySignature;\r",
+									"\r",
+									"    \r",
+									"// algabetical sort helper function\r",
+									"    function sortObj(obj) {\r",
+									"        return Object.keys(obj).sort().reduce(function (result, key) {\r",
+									"          result[key] = obj[key];\r",
+									"          return result;\r",
+									"        }, {});\r",
+									"      }\r",
+									"      \r",
+									"\r",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n        \"merchantNo\": \"{{merchantNo}}\",\r\n        \"storeNo\": \"{{storeNo}}\",\r\n        \"verifySign\": \"{{MySignature}}\",\r\n        \"customerNo\": \"2000300192541921276830\",\r\n        \"timestamp\": \"2024-01-08T12:40:58Z\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://mapi.yuansfer.yunkeguan.com/v3/payee/retrieve",
+							"protocol": "https",
+							"host": [
+								"mapi",
+								"yuansfer",
+								"yunkeguan",
+								"com"
+							],
+							"path": [
+								"v3",
+								"payee",
+								"retrieve"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Payee",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"var crypto = require('crypto-js')\r",
+									"\r",
+									"var rawBody = pm.request.body.raw;\r",
+									"const requestBody = JSON.parse(rawBody);\r",
+									"\r",
+									"var myPOSParamObject = {\r",
+									"    merchantNo: pm.collectionVariables.get('merchantNo'),\r",
+									"    storeNo: pm.collectionVariables.get('storeNo'),\r",
+									"    customerNo: requestBody.customerNo,\r",
+									"    // profileType: \"INDIVIDUAL\",\r",
+									"    // lang: \"DSPANISH\",\r",
+									"    // timestamp: \"??\",\r",
+									"    // city: \"Medellin\",\r",
+									"    // country: \"Colombia\",\r",
+									"    // countryCode:\"CO\",\r",
+									"    // customerCode: \"0001\",\r",
+									"    // dateOfBirth: \"1968-08-26\",\r",
+									"    // email: \"steven@gwocu.com\",\r",
+									"    // firstName: \"Steven\",\r",
+									"    // lastName: \"Seagal\",\r",
+									"    // phone: \"410-400-0000\",\r",
+									"    state: requestBody.state,\r",
+									"    // street: \"Calle 10\",\r",
+									"    // street2: \"Upperfloor\",\r",
+									"    zip: requestBody.zip\r",
+									"}\r",
+									"\r",
+									"// Calculate the VeriSign signature:\r",
+									"\r",
+									"var MySignature = CalculateSignature(pm.collectionVariables.get('MyToken'), myPOSParamObject);\r",
+									"\r",
+									"postman.setEnvironmentVariable(\"merchantNo\", myPOSParamObject.merchantNo);\r",
+									"postman.setEnvironmentVariable(\"storeNo\", myPOSParamObject.storeNo);\r",
+									"postman.setEnvironmentVariable(\"MySignature\", MySignature);\r",
+									"\r",
+									"\r",
+									"// function that calculates the signature according to Pockyt rules\r",
+									"function CalculateSignature(token,parameters)\r",
+									"{\r",
+									"    // calculate the hash value of the token\r",
+									"    \r",
+									"    // var ApiTokenHashvalue = CryptoJS.MD5(str_1 + str_2).toString();\r",
+									"    var ApiTokenHashvalue = crypto.MD5(token).toString();\r",
+									"    \r",
+									"    // order parameters alfabetically\r",
+									"    var SortedParams = sortObj(parameters);\r",
+									"    \r",
+									"    // Concatenate: add '&' between key and value pair and replace : for = \r",
+									"    var MyString = '' ;\r",
+									"    for (const [key, value] of Object.entries(SortedParams)) {\r",
+									"        MyString += (`${key}=${value}&`);}\r",
+									"\r",
+									"    //  add hash value of token at the and of the string\r",
+									"    MyString += ApiTokenHashvalue ;\r",
+									"\r",
+									"    // create the verifySign\r",
+									"\r",
+									"    const MySignature = crypto.MD5(MyString).toString();\r",
+									"\r",
+									"    return MySignature;\r",
+									"\r",
+									"    \r",
+									"// algabetical sort helper function\r",
+									"    function sortObj(obj) {\r",
+									"        return Object.keys(obj).sort().reduce(function (result, key) {\r",
+									"          result[key] = obj[key];\r",
+									"          return result;\r",
+									"        }, {});\r",
+									"      }\r",
+									"      \r",
+									"\r",
+									"}\r",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n        \"merchantNo\": \"{{merchantNo}}\",\r\n        \"storeNo\": \"{{storeNo}}\",\r\n        \"verifySign\": \"{{MySignature}}\",\r\n        \"customerNo\": \"2000300192541965662394\",\r\n        \"state\": \"FL\",\r\n        \"zip\": \"12345\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://mapi.yuansfer.yunkeguan.com//v3/payee/update",
+							"protocol": "https",
+							"host": [
+								"mapi",
+								"yuansfer",
+								"yunkeguan",
+								"com"
+							],
+							"path": [
+								"",
+								"v3",
+								"payee",
+								"update"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Add Payout Method",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"var crypto = require('crypto-js')\r",
+									"var MyTimestamp = (new Date(new Date().toString().split('GMT')[0]).toISOString().split('.')[0]);\r",
+									"\r",
+									"var rawBody = pm.request.body.raw;\r",
+									"const requestBody = JSON.parse(rawBody);\r",
+									"\r",
+									"var myPOSParamObject = {\r",
+									"    merchantNo: pm.collectionVariables.get('merchantNo'),\r",
+									"    storeNo: pm.collectionVariables.get('storeNo'),\r",
+									"    timestamp: requestBody.timestamp,\r",
+									"    customerNo: requestBody.customerNo,\r",
+									"    accountCountry: requestBody.accountCountry,\r",
+									"    accountCurrency: requestBody.accountCurrency,\r",
+									"    accountType: requestBody.accountType,\r",
+									"    accountTag: requestBody.accountTag,\r",
+									"    bankAccountId: requestBody.bankAccountId,\r",
+									"    branchId: requestBody.branchId,\r",
+									"    bankAccountPurpose: requestBody.bankAccountPurpose,\r",
+									"    clientIp: requestBody.clientIp,\r",
+									"    ipnUrl: requestBody.ipnUrl\r",
+									"}\r",
+									"\r",
+									"// Calculate the VeriSign signature:\r",
+									"\r",
+									"var MySignature = CalculateSignature(pm.collectionVariables.get('MyToken'), myPOSParamObject);\r",
+									"\r",
+									"postman.setEnvironmentVariable(\"merchantNo\", myPOSParamObject.merchantNo);\r",
+									"postman.setEnvironmentVariable(\"storeNo\", myPOSParamObject.storeNo);\r",
+									"postman.setEnvironmentVariable(\"MySignature\", MySignature);\r",
+									"\r",
+									"\r",
+									"// function that calculates the signature according to Pockyt rules\r",
+									"function CalculateSignature(token,parameters)\r",
+									"{\r",
+									"    // calculate the hash value of the token\r",
+									"    \r",
+									"    // var ApiTokenHashvalue = CryptoJS.MD5(str_1 + str_2).toString();\r",
+									"    var ApiTokenHashvalue = crypto.MD5(token).toString();\r",
+									"    \r",
+									"    // order parameters alfabetically\r",
+									"    var SortedParams = sortObj(parameters);\r",
+									"    \r",
+									"    // Concatenate: add '&' between key and value pair and replace : for = \r",
+									"    var MyString = '' ;\r",
+									"    for (const [key, value] of Object.entries(SortedParams)) {\r",
+									"        MyString += (`${key}=${value}&`);}\r",
+									"\r",
+									"    //  add hash value of token at the and of the string\r",
+									"    MyString += ApiTokenHashvalue ;\r",
+									"\r",
+									"    // create the verifySign\r",
+									"\r",
+									"    const MySignature = crypto.MD5(MyString).toString();\r",
+									"\r",
+									"    return MySignature;\r",
+									"\r",
+									"    \r",
+									"// algabetical sort helper function\r",
+									"    function sortObj(obj) {\r",
+									"        return Object.keys(obj).sort().reduce(function (result, key) {\r",
+									"          result[key] = obj[key];\r",
+									"          return result;\r",
+									"        }, {});\r",
+									"      }\r",
+									"      \r",
+									"\r",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n        \"merchantNo\": \"{{merchantNo}}\",\r\n        \"storeNo\": \"{{storeNo}}\",\r\n        \"verifySign\": \"{{MySignature}}\",\r\n        \"timestamp\": \"2024-01-09T11:50:58Z\",\r\n        \"customerNo\": \"2000305228303182610217\",\r\n        \"accountCountry\": \"US\",\r\n        \"accountCurrency\": \"USD\",\r\n        \"accountType\": \"BANK_ACCOUNT\",\r\n        \"accountTag\": \"1a52692711\",\r\n        \"bankAccountId\": \"101089292\",\r\n        \"branchId\": \"101089292\",\r\n        \"bankAccountPurpose\": \"CHECKING\",\r\n        \"clientIp\": \"127.0.0.1\",\r\n        \"ipnUrl\": \"https://example.com/webhooks\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://mapi.yuansfer.yunkeguan.com/v3/payee/account/create/bank-account",
+							"protocol": "https",
+							"host": [
+								"mapi",
+								"yuansfer",
+								"yunkeguan",
+								"com"
+							],
+							"path": [
+								"v3",
+								"payee",
+								"account",
+								"create",
+								"bank-account"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Payee Funding Accounts",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"var crypto = require('crypto-js')\r",
+									"var MyTimestamp = (new Date(new Date().toString().split('GMT')[0]).toISOString().split('.')[0]);\r",
+									"\r",
+									"var rawBody = pm.request.body.raw;\r",
+									"const requestBody = JSON.parse(rawBody);\r",
+									"\r",
+									"var myPOSParamObject = {\r",
+									"    merchantNo: pm.collectionVariables.get('merchantNo'),\r",
+									"    storeNo: pm.collectionVariables.get('storeNo'),\r",
+									"    timestamp : requestBody.timestamp,\r",
+									"    customerNo: requestBody.customerNo,\r",
+									"    accountToken: requestBody.accountToken\r",
+									"}\r",
+									"\r",
+									"// Calculate the VeriSign signature:\r",
+									"\r",
+									"var MySignature = CalculateSignature(pm.collectionVariables.get('MyToken'), myPOSParamObject);\r",
+									"\r",
+									"postman.setEnvironmentVariable(\"merchantNo\", myPOSParamObject.merchantNo);\r",
+									"postman.setEnvironmentVariable(\"storeNo\", myPOSParamObject.storeNo);\r",
+									"postman.setEnvironmentVariable(\"MySignature\", MySignature);\r",
+									"\r",
+									"\r",
+									"// function that calculates the signature according to Pockyt rules\r",
+									"function CalculateSignature(token,parameters)\r",
+									"{\r",
+									"    // calculate the hash value of the token\r",
+									"    \r",
+									"    // var ApiTokenHashvalue = CryptoJS.MD5(str_1 + str_2).toString();\r",
+									"    var ApiTokenHashvalue = crypto.MD5(token).toString();\r",
+									"    \r",
+									"    // order parameters alfabetically\r",
+									"    var SortedParams = sortObj(parameters);\r",
+									"    \r",
+									"    // Concatenate: add '&' between key and value pair and replace : for = \r",
+									"    var MyString = '' ;\r",
+									"    for (const [key, value] of Object.entries(SortedParams)) {\r",
+									"        MyString += (`${key}=${value}&`);}\r",
+									"\r",
+									"    //  add hash value of token at the and of the string\r",
+									"    MyString += ApiTokenHashvalue ;\r",
+									"\r",
+									"    // create the verifySign\r",
+									"\r",
+									"    const MySignature = crypto.MD5(MyString).toString();\r",
+									"\r",
+									"    return MySignature;\r",
+									"\r",
+									"    \r",
+									"// algabetical sort helper function\r",
+									"    function sortObj(obj) {\r",
+									"        return Object.keys(obj).sort().reduce(function (result, key) {\r",
+									"          result[key] = obj[key];\r",
+									"          return result;\r",
+									"        }, {});\r",
+									"      }\r",
+									"      \r",
+									"\r",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n        \"merchantNo\": \"{{merchantNo}}\",\r\n        \"storeNo\": \"{{storeNo}}\",\r\n        \"verifySign\": \"{{MySignature}}\",\r\n        \"timestamp\": \"2024-01-09T12:35:14Z\",\r\n        \"customerNo\": \"2000305228303182610217\",\r\n        \"accountToken\": \"2010305228303328538173\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://mapi.yuansfer.yunkeguan.com/v3/payee/account/delete",
+							"protocol": "https",
+							"host": [
+								"mapi",
+								"yuansfer",
+								"yunkeguan",
+								"com"
+							],
+							"path": [
+								"v3",
+								"payee",
+								"account",
+								"delete"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Retrieve Payee Funding Accounts",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"var crypto = require('crypto-js')\r",
+									"var MyTimestamp = (new Date(new Date().toString().split('GMT')[0]).toISOString().split('.')[0]);\r",
+									"\r",
+									"var rawBody = pm.request.body.raw;\r",
+									"const requestBody = JSON.parse(rawBody);\r",
+									"\r",
+									"var myPOSParamObject = {\r",
+									"    merchantNo: pm.collectionVariables.get('merchantNo'),\r",
+									"    storeNo: pm.collectionVariables.get('storeNo'),\r",
+									"    timestamp : requestBody.timestamp,\r",
+									"    customerNo: requestBody.customerNo,\r",
+									"    accountToken: requestBody.accountToken\r",
+									"}\r",
+									"\r",
+									"// Calculate the VeriSign signature:\r",
+									"\r",
+									"var MySignature = CalculateSignature(pm.collectionVariables.get('MyToken'), myPOSParamObject);\r",
+									"\r",
+									"postman.setEnvironmentVariable(\"merchantNo\", myPOSParamObject.merchantNo);\r",
+									"postman.setEnvironmentVariable(\"storeNo\", myPOSParamObject.storeNo);\r",
+									"postman.setEnvironmentVariable(\"MySignature\", MySignature);\r",
+									"\r",
+									"\r",
+									"// function that calculates the signature according to Pockyt rules\r",
+									"function CalculateSignature(token,parameters)\r",
+									"{\r",
+									"    // calculate the hash value of the token\r",
+									"    \r",
+									"    // var ApiTokenHashvalue = CryptoJS.MD5(str_1 + str_2).toString();\r",
+									"    var ApiTokenHashvalue = crypto.MD5(token).toString();\r",
+									"    \r",
+									"    // order parameters alfabetically\r",
+									"    var SortedParams = sortObj(parameters);\r",
+									"    \r",
+									"    // Concatenate: add '&' between key and value pair and replace : for = \r",
+									"    var MyString = '' ;\r",
+									"    for (const [key, value] of Object.entries(SortedParams)) {\r",
+									"        MyString += (`${key}=${value}&`);}\r",
+									"\r",
+									"    //  add hash value of token at the and of the string\r",
+									"    MyString += ApiTokenHashvalue ;\r",
+									"\r",
+									"    // create the verifySign\r",
+									"\r",
+									"    const MySignature = crypto.MD5(MyString).toString();\r",
+									"\r",
+									"    return MySignature;\r",
+									"\r",
+									"    \r",
+									"// algabetical sort helper function\r",
+									"    function sortObj(obj) {\r",
+									"        return Object.keys(obj).sort().reduce(function (result, key) {\r",
+									"          result[key] = obj[key];\r",
+									"          return result;\r",
+									"        }, {});\r",
+									"      }\r",
+									"      \r",
+									"\r",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n        \"merchantNo\": \"{{merchantNo}}\",\r\n        \"storeNo\": \"{{storeNo}}\",\r\n        \"verifySign\": \"{{MySignature}}\",\r\n        \"timestamp\": \"2024-01-09T12:35:14Z\",\r\n        \"customerNo\": \"2000305228303182610217\",\r\n        \"accountToken\": \"2010305228303328538173\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://mapi.yuansfer.yunkeguan.com/v3/payee/payout-accounts",
+							"protocol": "https",
+							"host": [
+								"mapi",
+								"yuansfer",
+								"yunkeguan",
+								"com"
+							],
+							"path": [
+								"v3",
+								"payee",
+								"payout-accounts"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Transfer Payout",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"var crypto = require('crypto-js')\r",
+									"var MyTimestamp = (new Date(new Date().toString().split('GMT')[0]).toISOString().split('.')[0]);\r",
+									"\r",
+									"var rawBody = pm.request.body.raw;\r",
+									"const requestBody = JSON.parse(rawBody);\r",
+									"\r",
+									"var myPOSParamObject = {\r",
+									"    merchantNo: pm.collectionVariables.get('merchantNo'),\r",
+									"    storeNo: pm.collectionVariables.get('storeNo'),\r",
+									"    customerNo: requestBody.customerNo,\r",
+									"    accountToken: requestBody.accountToken,\r",
+									"    invoiceId: requestBody.invoiceId,\r",
+									"    amount: requestBody.amount,\r",
+									"    currency: requestBody.currency,\r",
+									"    ipnUrl: requestBody.ipnUrl,\r",
+									"    memo: requestBody.memo,\r",
+									"    note: requestBody.memo,\r",
+									"    subject: requestBody.subject\r",
+									"}\r",
+									"\r",
+									"// Calculate the VeriSign signature:\r",
+									"\r",
+									"var MySignature = CalculateSignature(pm.collectionVariables.get('MyToken'), myPOSParamObject);\r",
+									"\r",
+									"postman.setEnvironmentVariable(\"merchantNo\", myPOSParamObject.merchantNo);\r",
+									"postman.setEnvironmentVariable(\"storeNo\", myPOSParamObject.storeNo);\r",
+									"postman.setEnvironmentVariable(\"MySignature\", MySignature);\r",
+									"\r",
+									"\r",
+									"// function that calculates the signature according to Pockyt rules\r",
+									"function CalculateSignature(token,parameters)\r",
+									"{\r",
+									"    // calculate the hash value of the token\r",
+									"    \r",
+									"    // var ApiTokenHashvalue = CryptoJS.MD5(str_1 + str_2).toString();\r",
+									"    var ApiTokenHashvalue = crypto.MD5(token).toString();\r",
+									"    \r",
+									"    // order parameters alfabetically\r",
+									"    var SortedParams = sortObj(parameters);\r",
+									"    \r",
+									"    // Concatenate: add '&' between key and value pair and replace : for = \r",
+									"    var MyString = '' ;\r",
+									"    for (const [key, value] of Object.entries(SortedParams)) {\r",
+									"        MyString += (`${key}=${value}&`);}\r",
+									"\r",
+									"    //  add hash value of token at the and of the string\r",
+									"    MyString += ApiTokenHashvalue ;\r",
+									"\r",
+									"    // create the verifySign\r",
+									"\r",
+									"    const MySignature = crypto.MD5(MyString).toString();\r",
+									"\r",
+									"    return MySignature;\r",
+									"\r",
+									"    \r",
+									"// algabetical sort helper function\r",
+									"    function sortObj(obj) {\r",
+									"        return Object.keys(obj).sort().reduce(function (result, key) {\r",
+									"          result[key] = obj[key];\r",
+									"          return result;\r",
+									"        }, {});\r",
+									"      }\r",
+									"      \r",
+									"\r",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n        \"merchantNo\": \"{{merchantNo}}\",\r\n        \"storeNo\": \"{{storeNo}}\",\r\n        \"verifySign\": \"{{MySignature}}\",\r\n        \"customerNo\": \"2000305228292319592008\",\r\n        \"accountToken\": \"2010305228303182765718\",\r\n        \"invoiceId\": \"9aae4c685d824c5da746f97620c59eb5\",\r\n        \"amount\": \"500\",\r\n        \"currency\": \"USD\",\r\n        \"ipnUrl\": \"https://example.com/webhooks\",\r\n        \"memo\": \"thank you\",\r\n        \"note\": \"Cold drink\",\r\n        \"subject\": \"Payouts\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://mapi.yuansfer.yunkeguan.com/v3/payouts/pay",
+							"protocol": "https",
+							"host": [
+								"mapi",
+								"yuansfer",
+								"yunkeguan",
+								"com"
+							],
+							"path": [
+								"v3",
+								"payouts",
+								"pay"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Retrieve Payor Balance",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"var crypto = require('crypto-js')\r",
+									"var MyTimestamp = (new Date(new Date().toString().split('GMT')[0]).toISOString().split('.')[0]);\r",
+									"\r",
+									"var rawBody = pm.request.body.raw;\r",
+									"const requestBody = JSON.parse(rawBody);\r",
+									"\r",
+									"var myPOSParamObject = {\r",
+									"    merchantNo: pm.collectionVariables.get('merchantNo'),\r",
+									"    storeNo: pm.collectionVariables.get('storeNo'),\r",
+									"    currency: requestBody.currency,\r",
+									"    timestamp: requestBody.timestamp\r",
+									"    \r",
+									"}\r",
+									"\r",
+									"// Calculate the VeriSign signature:\r",
+									"\r",
+									"var MySignature = CalculateSignature(pm.collectionVariables.get('MyToken'), myPOSParamObject);\r",
+									"\r",
+									"postman.setEnvironmentVariable(\"merchantNo\", myPOSParamObject.merchantNo);\r",
+									"postman.setEnvironmentVariable(\"storeNo\", myPOSParamObject.storeNo);\r",
+									"postman.setEnvironmentVariable(\"MySignature\", MySignature);\r",
+									"\r",
+									"// function that calculates the signature according to Pockyt rules\r",
+									"function CalculateSignature(token,parameters)\r",
+									"{\r",
+									"    // calculate the hash value of the token\r",
+									"    \r",
+									"    // var ApiTokenHashvalue = CryptoJS.MD5(str_1 + str_2).toString();\r",
+									"    var ApiTokenHashvalue = crypto.MD5(token).toString();\r",
+									"    \r",
+									"    // order parameters alfabetically\r",
+									"    var SortedParams = sortObj(parameters);\r",
+									"    \r",
+									"    // Concatenate: add '&' between key and value pair and replace : for = \r",
+									"    var MyString = '' ;\r",
+									"    for (const [key, value] of Object.entries(SortedParams)) {\r",
+									"        MyString += (`${key}=${value}&`);}\r",
+									"\r",
+									"    //  add hash value of token at the and of the string\r",
+									"    MyString += ApiTokenHashvalue ;\r",
+									"\r",
+									"    // create the verifySign\r",
+									"\r",
+									"    const MySignature = crypto.MD5(MyString).toString();\r",
+									"\r",
+									"    return MySignature;\r",
+									"\r",
+									"    \r",
+									"// algabetical sort helper function\r",
+									"    function sortObj(obj) {\r",
+									"        return Object.keys(obj).sort().reduce(function (result, key) {\r",
+									"          result[key] = obj[key];\r",
+									"          return result;\r",
+									"        }, {});\r",
+									"      }\r",
+									"      \r",
+									"\r",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n        \"merchantNo\": \"{{merchantNo}}\",\r\n        \"storeNo\": \"{{storeNo}}\",\r\n        \"verifySign\": \"{{MySignature}}\",\r\n        \"currency\": \"USD\",\r\n        \"timestamp\": \"2024-01-08T12:40:58Z\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://mapi.yuansfer.yunkeguan.com/v3/payouts/balance ",
+							"protocol": "https",
+							"host": [
+								"mapi",
+								"yuansfer",
+								"yunkeguan",
+								"com"
+							],
+							"path": [
+								"v3",
+								"payouts",
+								"balance "
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Register Payee",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"var crypto = require('crypto-js')\r",
+									"var MyTimestamp = (new Date(new Date().toString().split('GMT')[0]).toISOString().split('.')[0]);\r",
+									"\r",
+									"var rawBody = pm.request.body.raw;\r",
+									"const requestBody = JSON.parse(rawBody);\r",
+									"\r",
+									"var myPOSParamObject = {\r",
+									"    merchantNo: pm.collectionVariables.get('merchantNo'),\r",
+									"    storeNo: pm.collectionVariables.get('storeNo'),\r",
+									"    profileType: requestBody.profileType,\r",
+									"    lang: requestBody.lang,\r",
+									"    timestamp: requestBody.timestamp,\r",
+									"    city: requestBody.city,\r",
+									"    country: requestBody.country,\r",
+									"    countryCode:requestBody.countryCode,\r",
+									"    customerCode: requestBody.customerCode,\r",
+									"    dateOfBirth: requestBody.dateOfBirth,\r",
+									"    email: requestBody.email,\r",
+									"    firstName: requestBody.firstName,\r",
+									"    lastName: requestBody.lastName,\r",
+									"    phone: requestBody.phone,\r",
+									"    state: requestBody.state,\r",
+									"    street: requestBody.street,\r",
+									"    street2: requestBody.street2,\r",
+									"    zip: requestBody.zip,\r",
+									"    governmentId: requestBody.governmentId\r",
+									"}\r",
+									"\r",
+									"// Calculate the VeriSign signature:\r",
+									"\r",
+									"console.log(\"REQUESTBODY\");\r",
+									"console.log(myPOSParamObject);\r",
+									"\r",
+									"var MySignature = CalculateSignature(pm.collectionVariables.get('MyToken'), myPOSParamObject);\r",
+									"\r",
+									"postman.setEnvironmentVariable(\"merchantNo\", myPOSParamObject.merchantNo);\r",
+									"postman.setEnvironmentVariable(\"storeNo\", myPOSParamObject.storeNo);\r",
+									"postman.setEnvironmentVariable(\"MySignature\", MySignature);\r",
+									"\r",
+									"\r",
+									"// function that calculates the signature according to Pockyt rules\r",
+									"function CalculateSignature(token,parameters)\r",
+									"{\r",
+									"    // calculate the hash value of the token\r",
+									"    \r",
+									"    // var ApiTokenHashvalue = CryptoJS.MD5(str_1 + str_2).toString();\r",
+									"    var ApiTokenHashvalue = crypto.MD5(token).toString();\r",
+									"    \r",
+									"    // order parameters alfabetically\r",
+									"    var SortedParams = sortObj(parameters);\r",
+									"    \r",
+									"    // Concatenate: add '&' between key and value pair and replace : for = \r",
+									"    var MyString = '' ;\r",
+									"    for (const [key, value] of Object.entries(SortedParams)) {\r",
+									"        MyString += (`${key}=${value}&`);}\r",
+									"\r",
+									"    //  add hash value of token at the and of the string\r",
+									"    MyString += ApiTokenHashvalue ;\r",
+									"\r",
+									"    // create the verifySign\r",
+									"\r",
+									"    const MySignature = crypto.MD5(MyString).toString();\r",
+									"\r",
+									"    return MySignature;\r",
+									"\r",
+									"    \r",
+									"// algabetical sort helper function\r",
+									"    function sortObj(obj) {\r",
+									"        return Object.keys(obj).sort().reduce(function (result, key) {\r",
+									"          result[key] = obj[key];\r",
+									"          return result;\r",
+									"        }, {});\r",
+									"      }\r",
+									"      \r",
+									"\r",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n        \"merchantNo\": \"{{merchantNo}}\",\r\n        \"storeNo\": \"{{storeNo}}\",\r\n        \"verifySign\": \"{{MySignature}}\",\r\n        \"profileType\": \"INDIVIDUAL\",\r\n        \"lang\": \"SPANISH\",\r\n        \"timestamp\": \"2024-01-08T12:37:58Z\",\r\n        \"city\": \"Miami\",\r\n        \"country\": \"USA\",\r\n        \"countryCode\": \"US\",\r\n        \"customerCode\": \"0007\",\r\n        \"dateOfBirth\": \"1968-08-26\",\r\n        \"email\": \"simon@gwocu.com\",\r\n        \"firstName\": \"simon\",\r\n        \"lastName\": \"Bolivar\",\r\n        \"phone\": \"310-001-001\",\r\n        \"state\": \"Florida\",\r\n        \"street\": \"Calle 10\",\r\n        \"street2\": \"Upperfloor\",\r\n        \"zip\": \"33101\",\r\n        \"governmentId\": \"123456789\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://mapi.yuansfer.yunkeguan.com/v3/payee/register",
+							"protocol": "https",
+							"host": [
+								"mapi",
+								"yuansfer",
+								"yunkeguan",
+								"com"
+							],
+							"path": [
+								"v3",
+								"payee",
+								"register"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "ADD API",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"var crypto = require('crypto-js')\r",
+							"\r",
+							"var rawBody = pm.request.body.raw;\r",
+							"const requestBody = JSON.parse(rawBody);\r",
+							"\r",
+							"console.log(requestBody);\r",
+							"\r",
+							"var myPOSParamObject = {\r",
+							"    merchantNo: pm.collectionVariables.get('merchantNo'),\r",
+							"    storeNo: pm.collectionVariables.get('storeNo'),\r",
+							"    amount: requestBody.amount,\r",
+							"    currency: requestBody.currency,\r",
+							"    settleCurrency: requestBody.settleCurrency,\r",
+							"    reference: requestBody.reference\r",
+							"}\r",
+							"\r",
+							"// Calculate the VeriSign signature:\r",
+							"\r",
+							"var MySignature = CalculateSignature(pm.collectionVariables.get('MyToken'), myPOSParamObject);\r",
+							"\r",
+							"postman.setEnvironmentVariable(\"merchantNo\", myPOSParamObject.merchantNo);\r",
+							"postman.setEnvironmentVariable(\"storeNo\", myPOSParamObject.storeNo);\r",
+							"postman.setEnvironmentVariable(\"\", myPOSParamObject.merchantNo);\r",
+							"postman.setEnvironmentVariable(\"MySignature\", MySignature);\r",
+							"\r",
+							"\r",
+							"// function that calculates the signature according to Pockyt rules\r",
+							"function CalculateSignature(token,parameters)\r",
+							"{\r",
+							"    // calculate the hash value of the token\r",
+							"    \r",
+							"    // var ApiTokenHashvalue = CryptoJS.MD5(str_1 + str_2).toString();\r",
+							"    var ApiTokenHashvalue = crypto.MD5(token).toString();\r",
+							"    \r",
+							"    // order parameters alfabetically\r",
+							"    var SortedParams = sortObj(parameters);\r",
+							"    \r",
+							"    // Concatenate: add '&' between key and value pair and replace : for = \r",
+							"    var MyString = '' ;\r",
+							"    for (const [key, value] of Object.entries(SortedParams)) {\r",
+							"        MyString += (`${key}=${value}&`);}\r",
+							"\r",
+							"    //  add hash value of token at the and of the string\r",
+							"    MyString += ApiTokenHashvalue ;\r",
+							"\r",
+							"    // create the verifySign\r",
+							"\r",
+							"    const MySignature = crypto.MD5(MyString).toString();\r",
+							"\r",
+							"    return MySignature;\r",
+							"\r",
+							"    \r",
+							"// algabetical sort helper function\r",
+							"    function sortObj(obj) {\r",
+							"        return Object.keys(obj).sort().reduce(function (result, key) {\r",
+							"          result[key] = obj[key];\r",
+							"          return result;\r",
+							"        }, {});\r",
+							"      }\r",
+							"      \r",
+							"\r",
+							"}"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n        \"merchantNo\": \"{{merchantNo}}\",\r\n        \"storeNo\": \"{{storeNo}}\",\r\n        \"verifySign\": \"{{MySignature}}\",\r\n        \"amount\": 100,\r\n        \"currency\": \"USD\",\r\n        \"settleCurrency\": \"USD\",\r\n        \"reference\": \"10101723tttt\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://mapi.yuansfer.yunkeguan.com/app-instore/v3/add",
+					"protocol": "https",
+					"host": [
+						"mapi",
+						"yuansfer",
+						"yunkeguan",
+						"com"
+					],
+					"path": [
+						"app-instore",
+						"v3",
+						"add"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "TRANSACT-QUERY-WITH-TRANSACTNO",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"var crypto = require('crypto-js')\r",
+							"\r",
+							"var rawBody = pm.request.body.raw;\r",
+							"const requestBody = JSON.parse(rawBody);\r",
+							"\r",
+							"var myPOSParamObject = {\r",
+							"    merchantNo: pm.collectionVariables.get('merchantNo'),\r",
+							"    storeNo: pm.collectionVariables.get('storeNo'),\r",
+							"    transactionNo: requestBody.transactionNo,\r",
+							"    // reference: No reference in this case\r",
+							"}\r",
+							"\r",
+							"// Calculate the VeriSign signature:\r",
+							"\r",
+							"var MySignature = CalculateSignature(pm.collectionVariables.get('MyToken'), myPOSParamObject);\r",
+							"\r",
+							"postman.setEnvironmentVariable(\"merchantNo\", myPOSParamObject.merchantNo);\r",
+							"postman.setEnvironmentVariable(\"storeNo\", myPOSParamObject.storeNo);\r",
+							"postman.setEnvironmentVariable(\"MySignature\", MySignature);\r",
+							"postman.setEnvironmentVariable(\"transactionNo\", myPOSParamObject.transactionNo);\r",
+							"// postman.setEnvironmentVariable(\"reference\", myPOSParamObject.reference);\r",
+							"\r",
+							"// function that calculates the signature according to Pockyt rules\r",
+							"function CalculateSignature(token,parameters)\r",
+							"{\r",
+							"    // calculate the hash value of the token\r",
+							"    \r",
+							"    // var ApiTokenHashvalue = CryptoJS.MD5(str_1 + str_2).toString();\r",
+							"    var ApiTokenHashvalue = crypto.MD5(token).toString();\r",
+							"    \r",
+							"    // order parameters alfabetically\r",
+							"    var SortedParams = sortObj(parameters);\r",
+							"    \r",
+							"    // Concatenate: add '&' between key and value pair and replace : for = \r",
+							"    var MyString = '' ;\r",
+							"    for (const [key, value] of Object.entries(SortedParams)) {\r",
+							"        MyString += (`${key}=${value}&`);}\r",
+							"\r",
+							"    //  add hash value of token at the and of the string\r",
+							"    MyString += ApiTokenHashvalue ;\r",
+							"\r",
+							"    // create the verifySign\r",
+							"\r",
+							"    const MySignature = crypto.MD5(MyString).toString();\r",
+							"\r",
+							"    return MySignature;\r",
+							"\r",
+							"    \r",
+							"// algabetical sort helper function\r",
+							"    function sortObj(obj) {\r",
+							"        return Object.keys(obj).sort().reduce(function (result, key) {\r",
+							"          result[key] = obj[key];\r",
+							"          return result;\r",
+							"        }, {});\r",
+							"      }\r",
+							"      \r",
+							"\r",
+							"}"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n        \"merchantNo\": \"{{merchantNo}}\",\r\n        \"storeNo\": \"{{storeNo}}\",\r\n        \"verifySign\": \"{{MySignature}}\",\r\n        \"transactionNo\": \"317818259578419040\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://mapi.yuansfer.yunkeguan.com/app-data-search/v3/tran-query",
+					"protocol": "https",
+					"host": [
+						"mapi",
+						"yuansfer",
+						"yunkeguan",
+						"com"
+					],
+					"path": [
+						"app-data-search",
+						"v3",
+						"tran-query"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "TRANSACT-QUERY-WITH-REFERENCE-API",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"var crypto = require('crypto-js')\r",
+							"\r",
+							"var rawBody = pm.request.body.raw;\r",
+							"const requestBody = JSON.parse(rawBody);\r",
+							"\r",
+							"var myPOSParamObject = {\r",
+							"    merchantNo: pm.collectionVariables.get('merchantNo'),\r",
+							"    storeNo: pm.collectionVariables.get('storeNo'),\r",
+							"    // transactionNo: \"317818259578419040\"\r",
+							"    reference: requestBody.reference\r",
+							"}\r",
+							"\r",
+							"// Calculate the VeriSign signature:\r",
+							"\r",
+							"var MySignature = CalculateSignature(pm.collectionVariables.get('MyToken'), myPOSParamObject);\r",
+							"\r",
+							"postman.setEnvironmentVariable(\"merchantNo\", myPOSParamObject.merchantNo);\r",
+							"postman.setEnvironmentVariable(\"storeNo\", myPOSParamObject.storeNo);\r",
+							"postman.setEnvironmentVariable(\"MySignature\", MySignature);\r",
+							"// postman.setEnvironmentVariable(\"transactionNo\", myPOSParamObject.transactionNo);\r",
+							"postman.setEnvironmentVariable(\"reference\", myPOSParamObject.reference);\r",
+							"\r",
+							"// function that calculates the signature according to Pockyt rules\r",
+							"function CalculateSignature(token,parameters)\r",
+							"{\r",
+							"    // calculate the hash value of the token\r",
+							"    \r",
+							"    // var ApiTokenHashvalue = CryptoJS.MD5(str_1 + str_2).toString();\r",
+							"    var ApiTokenHashvalue = crypto.MD5(token).toString();\r",
+							"    \r",
+							"    // order parameters alfabetically\r",
+							"    var SortedParams = sortObj(parameters);\r",
+							"    \r",
+							"    // Concatenate: add '&' between key and value pair and replace : for = \r",
+							"    var MyString = '' ;\r",
+							"    for (const [key, value] of Object.entries(SortedParams)) {\r",
+							"        MyString += (`${key}=${value}&`);}\r",
+							"\r",
+							"    //  add hash value of token at the and of the string\r",
+							"    MyString += ApiTokenHashvalue ;\r",
+							"\r",
+							"    // create the verifySign\r",
+							"\r",
+							"    const MySignature = crypto.MD5(MyString).toString();\r",
+							"\r",
+							"    return MySignature;\r",
+							"\r",
+							"    \r",
+							"// algabetical sort helper function\r",
+							"    function sortObj(obj) {\r",
+							"        return Object.keys(obj).sort().reduce(function (result, key) {\r",
+							"          result[key] = obj[key];\r",
+							"          return result;\r",
+							"        }, {});\r",
+							"      }\r",
+							"      \r",
+							"\r",
+							"}"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n        \"merchantNo\": \"{{merchantNo}}\",\r\n        \"storeNo\": \"{{storeNo}}\",\r\n        \"verifySign\": \"{{MySignature}}\",\r\n        \"reference\": \"101016\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://mapi.yuansfer.yunkeguan.com/app-data-search/v3/tran-query",
+					"protocol": "https",
+					"host": [
+						"mapi",
+						"yuansfer",
+						"yunkeguan",
+						"com"
+					],
+					"path": [
+						"app-data-search",
+						"v3",
+						"tran-query"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "CANCEL-API",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"var crypto = require('crypto-js')\r",
+							"\r",
+							"var rawBody = pm.request.body.raw;\r",
+							"const requestBody = JSON.parse(rawBody);\r",
+							"\r",
+							"var myPOSParamObject = {\r",
+							"    merchantNo: pm.collectionVariables.get('merchantNo'),\r",
+							"    storeNo: pm.collectionVariables.get('storeNo'),\r",
+							"    transactionNo: requestBody.transactionNo\r",
+							"}\r",
+							"\r",
+							"// Calculate the VeriSign signature:\r",
+							"\r",
+							"var MySignature = CalculateSignature(pm.collectionVariables.get('MyToken'), myPOSParamObject);\r",
+							"\r",
+							"postman.setEnvironmentVariable(\"merchantNo\", myPOSParamObject.merchantNo);\r",
+							"postman.setEnvironmentVariable(\"storeNo\", myPOSParamObject.storeNo);\r",
+							"postman.setEnvironmentVariable(\"MySignature\", MySignature);\r",
+							"postman.setEnvironmentVariable(\"transactionNo\", myPOSParamObject.transactionNo);\r",
+							"\r",
+							"// function that calculates the signature according to Pockyt rules\r",
+							"function CalculateSignature(token,parameters)\r",
+							"{\r",
+							"    // calculate the hash value of the token\r",
+							"    \r",
+							"    // var ApiTokenHashvalue = CryptoJS.MD5(str_1 + str_2).toString();\r",
+							"    var ApiTokenHashvalue = crypto.MD5(token).toString();\r",
+							"    \r",
+							"    // order parameters alfabetically\r",
+							"    var SortedParams = sortObj(parameters);\r",
+							"    \r",
+							"    // Concatenate: add '&' between key and value pair and replace : for = \r",
+							"    var MyString = '' ;\r",
+							"    for (const [key, value] of Object.entries(SortedParams)) {\r",
+							"        MyString += (`${key}=${value}&`);}\r",
+							"\r",
+							"    //  add hash value of token at the and of the string\r",
+							"    MyString += ApiTokenHashvalue ;\r",
+							"\r",
+							"    // create the verifySign\r",
+							"\r",
+							"    const MySignature = crypto.MD5(MyString).toString();\r",
+							"\r",
+							"    return MySignature;\r",
+							"\r",
+							"    \r",
+							"// algabetical sort helper function\r",
+							"    function sortObj(obj) {\r",
+							"        return Object.keys(obj).sort().reduce(function (result, key) {\r",
+							"          result[key] = obj[key];\r",
+							"          return result;\r",
+							"        }, {});\r",
+							"      }\r",
+							"      \r",
+							"\r",
+							"}"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n        \"merchantNo\": \"{{merchantNo}}\",\r\n        \"storeNo\": \"{{storeNo}}\",\r\n        \"verifySign\": \"{{MySignature}}\",\r\n        \"transactionNo\": \"341815598184230981\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://mapi.yuansfer.yunkeguan.com/app-data-search/v3/cancel",
+					"protocol": "https",
+					"host": [
+						"mapi",
+						"yuansfer",
+						"yunkeguan",
+						"com"
+					],
+					"path": [
+						"app-data-search",
+						"v3",
+						"cancel"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "PRE-PAY-API",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"var crypto = require('crypto-js')\r",
+							"\r",
+							"var rawBody = pm.request.body.raw;\r",
+							"const requestBody = JSON.parse(rawBody);\r",
+							"\r",
+							"var myPOSParamObject = {\r",
+							"    merchantNo: pm.collectionVariables.get('merchantNo'),\r",
+							"    storeNo: pm.collectionVariables.get('storeNo'),\r",
+							"    transactionNo: requestBody.transactionNo,\r",
+							"    paymentBarcode: requestBody.paymentBarcode,\r",
+							"    vendor: requestBody.vendor\r",
+							"}\r",
+							"\r",
+							"// Calculate the VeriSign signature:\r",
+							"\r",
+							"var MySignature = CalculateSignature(pm.collectionVariables.get('MyToken'), myPOSParamObject);\r",
+							"\r",
+							"postman.setEnvironmentVariable(\"merchantNo\", myPOSParamObject.merchantNo);\r",
+							"postman.setEnvironmentVariable(\"storeNo\", myPOSParamObject.storeNo);\r",
+							"postman.setEnvironmentVariable(\"MySignature\", MySignature);\r",
+							"postman.setEnvironmentVariable(\"transactionNo\", myPOSParamObject.transactionNo);\r",
+							"postman.setEnvironmentVariable(\"paymentBarcode\", myPOSParamObject.paymentBarcode);\r",
+							"postman.setEnvironmentVariable(\"vendor\", myPOSParamObject.vendor);\r",
+							"\r",
+							"// function that calculates the signature according to Pockyt rules\r",
+							"function CalculateSignature(token,parameters)\r",
+							"{\r",
+							"    // calculate the hash value of the token\r",
+							"    \r",
+							"    // var ApiTokenHashvalue = CryptoJS.MD5(str_1 + str_2).toString();\r",
+							"    var ApiTokenHashvalue = crypto.MD5(token).toString();\r",
+							"    \r",
+							"    // order parameters alfabetically\r",
+							"    var SortedParams = sortObj(parameters);\r",
+							"    \r",
+							"    // Concatenate: add '&' between key and value pair and replace : for = \r",
+							"    var MyString = '' ;\r",
+							"    for (const [key, value] of Object.entries(SortedParams)) {\r",
+							"        MyString += (`${key}=${value}&`);}\r",
+							"\r",
+							"    //  add hash value of token at the and of the string\r",
+							"    MyString += ApiTokenHashvalue ;\r",
+							"\r",
+							"    // create the verifySign\r",
+							"\r",
+							"    const MySignature = crypto.MD5(MyString).toString();\r",
+							"\r",
+							"    return MySignature;\r",
+							"\r",
+							"    \r",
+							"// algabetical sort helper function\r",
+							"    function sortObj(obj) {\r",
+							"        return Object.keys(obj).sort().reduce(function (result, key) {\r",
+							"          result[key] = obj[key];\r",
+							"          return result;\r",
+							"        }, {});\r",
+							"      }\r",
+							"      \r",
+							"\r",
+							"}"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n        \"merchantNo\": \"{{merchantNo}}\",\r\n        \"storeNo\": \"{{storeNo}}\",\r\n        \"verifySign\": \"{{MySignature}}\",\r\n        \"transactionNo\": \"317818259578419040\",\r\n        \"paymentBarcode\": \"286521182446652715\",\r\n        \"vendor\": \"alipay\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://mapi.yuansfer.yunkeguan.com/app-instore/v3/prepay",
+					"protocol": "https",
+					"host": [
+						"mapi",
+						"yuansfer",
+						"yunkeguan",
+						"com"
+					],
+					"path": [
+						"app-instore",
+						"v3",
+						"prepay"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Merchant Presented QR",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"var crypto = require('crypto-js')\r",
+							"\r",
+							"var rawBody = pm.request.body.raw;\r",
+							"const requestBody = JSON.parse(rawBody);\r",
+							"\r",
+							"var myPOSParamObject = {\r",
+							"    merchantNo: pm.collectionVariables.get('merchantNo'),\r",
+							"    storeNo: pm.collectionVariables.get('storeNo'),\r",
+							"    amount: requestBody.amount,\r",
+							"    currency: requestBody.currency,\r",
+							"    settleCurrency: requestBody.settleCurrency,\r",
+							"    needQrcode: requestBody.needQrcode,\r",
+							"    reference: requestBody.reference,\r",
+							"    ipnUrl: requestBody.ipnUrl,\r",
+							"    vendor: requestBody.vendor,\r",
+							"    timeout:requestBody.timeout\r",
+							"}\r",
+							"\r",
+							"// Calculate the VeriSign signature:\r",
+							"\r",
+							"var MySignature = CalculateSignature(pm.collectionVariables.get('MyToken'), myPOSParamObject);\r",
+							"\r",
+							"postman.setEnvironmentVariable(\"merchantNo\", myPOSParamObject.merchantNo);\r",
+							"postman.setEnvironmentVariable(\"storeNo\", myPOSParamObject.storeNo);\r",
+							"postman.setEnvironmentVariable(\"MySignature\", MySignature);\r",
+							"\r",
+							"// function that calculates the signature according to Pockyt rules\r",
+							"function CalculateSignature(token,parameters)\r",
+							"{\r",
+							"    // calculate the hash value of the token\r",
+							"    \r",
+							"    // var ApiTokenHashvalue = CryptoJS.MD5(str_1 + str_2).toString();\r",
+							"    var ApiTokenHashvalue = crypto.MD5(token).toString();\r",
+							"    \r",
+							"    // order parameters alfabetically\r",
+							"    var SortedParams = sortObj(parameters);\r",
+							"    \r",
+							"    // Concatenate: add '&' between key and value pair and replace : for = \r",
+							"    var MyString = '' ;\r",
+							"    for (const [key, value] of Object.entries(SortedParams)) {\r",
+							"        MyString += (`${key}=${value}&`);}\r",
+							"\r",
+							"    //  add hash value of token at the and of the string\r",
+							"    MyString += ApiTokenHashvalue ;\r",
+							"\r",
+							"    // create the verifySign\r",
+							"\r",
+							"    const MySignature = crypto.MD5(MyString).toString();\r",
+							"\r",
+							"    return MySignature;\r",
+							"\r",
+							"    \r",
+							"// algabetical sort helper function\r",
+							"    function sortObj(obj) {\r",
+							"        return Object.keys(obj).sort().reduce(function (result, key) {\r",
+							"          result[key] = obj[key];\r",
+							"          return result;\r",
+							"        }, {});\r",
+							"      }\r",
+							"      \r",
+							"\r",
+							"}"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n        \"merchantNo\": \"{{merchantNo}}\",\r\n        \"storeNo\": \"{{storeNo}}\",\r\n        \"verifySign\": \"{{MySignature}}\",\r\n        \"amount\": \"0.11\",\r\n        \"currency\": \"USD\",\r\n        \"settleCurrency\": \"USD\",\r\n        \"needQrcode\": \"true\",\r\n        \"reference\": \"test2020102023\",\r\n        \"ipnUrl\": \"http://zk-tys.yunkeguan.com/login/test\",\r\n        \"vendor\": \"alipay\",\r\n        \"timeout\": \"120\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://mapi.yuansfer.yunkeguan.com/app-instore/v3/create-trans-qrcode",
+					"protocol": "https",
+					"host": [
+						"mapi",
+						"yuansfer",
+						"yunkeguan",
+						"com"
+					],
+					"path": [
+						"app-instore",
+						"v3",
+						"create-trans-qrcode"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "REFUND-API",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"var crypto = require('crypto-js')\r",
+							"\r",
+							"var rawBody = pm.request.body.raw;\r",
+							"const requestBody = JSON.parse(rawBody);\r",
+							"\r",
+							"var myPOSParamObject = {\r",
+							"    merchantNo: pm.collectionVariables.get('merchantNo'),\r",
+							"    storeNo: pm.collectionVariables.get('storeNo'),\r",
+							"    refundAmount: requestBody.refundAmount,\r",
+							"    currency: requestBody.currency,\r",
+							"    settleCurrency: requestBody.settleCurrency,\r",
+							"    transactionNo: requestBody.transactionNo\r",
+							"}\r",
+							"\r",
+							"// Calculate the VeriSign signature:\r",
+							"\r",
+							"var MySignature = CalculateSignature(pm.collectionVariables.get('MyToken'), myPOSParamObject);\r",
+							"\r",
+							"postman.setEnvironmentVariable(\"merchantNo\", myPOSParamObject.merchantNo);\r",
+							"postman.setEnvironmentVariable(\"storeNo\", myPOSParamObject.storeNo);\r",
+							"postman.setEnvironmentVariable(\"MySignature\", MySignature);\r",
+							"postman.setEnvironmentVariable(\"refundAmount\", myPOSParamObject.refundAmount);\r",
+							"postman.setEnvironmentVariable(\"currency\", myPOSParamObject.currency);\r",
+							"postman.setEnvironmentVariable(\"settleCurrency\", myPOSParamObject.settleCurrency);\r",
+							"postman.setEnvironmentVariable(\"transactionNo\", myPOSParamObject.transactionNo);\r",
+							"\r",
+							"// function that calculates the signature according to Pockyt rules\r",
+							"function CalculateSignature(token,parameters)\r",
+							"{\r",
+							"    // calculate the hash value of the token\r",
+							"    \r",
+							"    // var ApiTokenHashvalue = CryptoJS.MD5(str_1 + str_2).toString();\r",
+							"    var ApiTokenHashvalue = crypto.MD5(token).toString();\r",
+							"    \r",
+							"    // order parameters alfabetically\r",
+							"    var SortedParams = sortObj(parameters);\r",
+							"    \r",
+							"    // Concatenate: add '&' between key and value pair and replace : for = \r",
+							"    var MyString = '' ;\r",
+							"    for (const [key, value] of Object.entries(SortedParams)) {\r",
+							"        MyString += (`${key}=${value}&`);}\r",
+							"\r",
+							"    //  add hash value of token at the and of the string\r",
+							"    MyString += ApiTokenHashvalue ;\r",
+							"\r",
+							"    // create the verifySign\r",
+							"\r",
+							"    const MySignature = crypto.MD5(MyString).toString();\r",
+							"\r",
+							"    return MySignature;\r",
+							"\r",
+							"    \r",
+							"// algabetical sort helper function\r",
+							"    function sortObj(obj) {\r",
+							"        return Object.keys(obj).sort().reduce(function (result, key) {\r",
+							"          result[key] = obj[key];\r",
+							"          return result;\r",
+							"        }, {});\r",
+							"      }\r",
+							"      \r",
+							"\r",
+							"}"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n        \"merchantNo\": \"{{merchantNo}}\",\r\n        \"storeNo\": \"{{storeNo}}\",\r\n        \"verifySign\": \"{{MySignature}}\",\r\n        \"refundAmount\": \"1\",\r\n        \"currency\": \"USD\",\r\n        \"settleCurrency\": \"USD\",\r\n        \"transactionNo\": \"316129873376769782\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://mapi.yuansfer.yunkeguan.com/app-data-search/v3/refund",
+					"protocol": "https",
+					"host": [
+						"mapi",
+						"yuansfer",
+						"yunkeguan",
+						"com"
+					],
+					"path": [
+						"app-data-search",
+						"v3",
+						"refund"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

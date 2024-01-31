@@ -79,11 +79,11 @@ router.post("/multiple-upload", upload.array("file", 50), (req, res) => {
           const directory = "upload"; // the directory you want to delete files from
 
           fs.readdir(directory, (err, files) => {
-          if (err) throw err;
+          if (err) {console.log("There was an error reading directory")};
 
           for (const file of files) {
           fs.unlink(path.join(directory, file), (err) => {
-          if (err) throw err;
+          if (err) {console.log("There was an error deleting")};
           });
           }
           });

@@ -40,6 +40,23 @@ router.post("/query", async (req, res) => {
   }
 })
 
+router.post("/explorers", async (req, res) => {
+  try {
+    const url = base_url + "/api/users/explorers"
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(req.body)
+    });
+    const myresponse = await response.json();
+    res.status(response.status).json(myresponse);
+  } catch (err) {
+    res.status(500).json(err)
+  }
+})
+
 //Query all users for a chatbot
 router.post("/queryall", async (req, res) => {
   try {
