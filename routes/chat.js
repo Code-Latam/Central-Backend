@@ -4,7 +4,7 @@ const dotenv = require("dotenv");
 dotenv.config();
 var base_url = process.env.BASE_CONFIG_URL ;
 
-// Ask AI questions about anything
+// Ask AI questions about anything. More comments
 router.post("/ask", async (req, res) => {
   try {
     const url = base_url + "/api/chat/ask"
