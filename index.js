@@ -14,6 +14,7 @@ const corsOptions = {
 
 
 const clientRoute = require("./routes/clients");
+const thirdpartyRoute = require("./routes/thirdparties");
 const chatbotRoute = require("./routes/chatbots");
 const authRoute = require("./routes/auth");
 const userRoute = require("./routes/users");
@@ -52,6 +53,7 @@ app.use(cors(corsOptions));
 
 
 app.use("/api/clients", clientRoute);
+app.use("/api/thirdparties", thirdpartyRoute);
 app.use("/api/chatbots", chatbotRoute);
 app.use("/api/auth", authRoute);
 app.use("/api/users", userRoute);
