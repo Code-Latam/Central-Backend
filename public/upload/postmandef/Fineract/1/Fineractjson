@@ -1,0 +1,1255 @@
+{
+	"info": {
+		"_postman_id": "c4db3272-5125-4b38-86a4-92e4a0f50822",
+		"name": "Fineract",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "25749966",
+		"_collection_link": "https://red-comet-433941.postman.co/workspace/Fineract~72493301-5f9c-4aa5-a7e2-c626925412d6/collection/25749966-c4db3272-5125-4b38-86a4-92e4a0f50822?action=share&source=collection_link&creator=25749966"
+	},
+	"item": [
+		{
+			"name": "Accounts",
+			"item": [
+				{
+					"name": "Savings Accounts",
+					"item": [
+						{
+							"name": "List Savings Accounts",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"auth": {
+									"type": "basic",
+									"basic": [
+										{
+											"key": "password",
+											"value": "password",
+											"type": "string"
+										},
+										{
+											"key": "username",
+											"value": "mifos",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									},
+									{
+										"key": "Fineract-Platform-TenantId",
+										"value": "default",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "https://core.gwocu.com/fineract-provider/api/v1/savingsaccounts",
+									"protocol": "https",
+									"host": [
+										"core",
+										"gwocu",
+										"com"
+									],
+									"path": [
+										"fineract-provider",
+										"api",
+										"v1",
+										"savingsaccounts"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "List One  Savings Account",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"auth": {
+									"type": "basic",
+									"basic": [
+										{
+											"key": "password",
+											"value": "password",
+											"type": "string"
+										},
+										{
+											"key": "username",
+											"value": "mifos",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									},
+									{
+										"key": "Fineract-Platform-TenantId",
+										"value": "default",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "https://core.gwocu.com/fineract-provider/api/v1/savingsaccounts/6",
+									"protocol": "https",
+									"host": [
+										"core",
+										"gwocu",
+										"com"
+									],
+									"path": [
+										"fineract-provider",
+										"api",
+										"v1",
+										"savingsaccounts",
+										"6"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Savings Account Deposit",
+							"request": {
+								"auth": {
+									"type": "basic",
+									"basic": [
+										{
+											"key": "password",
+											"value": "password",
+											"type": "string"
+										},
+										{
+											"key": "username",
+											"value": "mifos",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									},
+									{
+										"key": "Fineract-Platform-TenantId",
+										"value": "default",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n  \"locale\": \"en\",\r\n  \"dateFormat\": \"dd MMMM yyyy\",\r\n  \"transactionDate\": \"18 February 2024\",\r\n  \"transactionAmount\": \"1000\",\r\n  \"paymentTypeId\": \"4\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "https://core.gwocu.com/fineract-provider/api/v1/savingsaccounts/6/transactions?command=deposit",
+									"protocol": "https",
+									"host": [
+										"core",
+										"gwocu",
+										"com"
+									],
+									"path": [
+										"fineract-provider",
+										"api",
+										"v1",
+										"savingsaccounts",
+										"6",
+										"transactions"
+									],
+									"query": [
+										{
+											"key": "command",
+											"value": "deposit"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Savings Account Withdrawal",
+							"request": {
+								"auth": {
+									"type": "basic",
+									"basic": [
+										{
+											"key": "password",
+											"value": "password",
+											"type": "string"
+										},
+										{
+											"key": "username",
+											"value": "mifos",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									},
+									{
+										"key": "Fineract-Platform-TenantId",
+										"value": "default",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n  \"locale\": \"en\",\r\n  \"dateFormat\": \"dd MMMM yyyy\",\r\n  \"transactionDate\": \"18 February 2024\",\r\n  \"transactionAmount\": \"100\",\r\n  \"paymentTypeId\": \"4\"\r\n}\r\n",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "https://core.gwocu.com/fineract-provider/api/v1/savingsaccounts/6/transactions?command=withdrawal",
+									"protocol": "https",
+									"host": [
+										"core",
+										"gwocu",
+										"com"
+									],
+									"path": [
+										"fineract-provider",
+										"api",
+										"v1",
+										"savingsaccounts",
+										"6",
+										"transactions"
+									],
+									"query": [
+										{
+											"key": "command",
+											"value": "withdrawal"
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Account Number formats",
+					"item": [
+						{
+							"name": "List account Number Formats",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"auth": {
+									"type": "basic",
+									"basic": [
+										{
+											"key": "password",
+											"value": "password",
+											"type": "string"
+										},
+										{
+											"key": "username",
+											"value": "mifos",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									},
+									{
+										"key": "Fineract-Platform-TenantId",
+										"value": "default",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "https://core.gwocu.com/fineract-provider/api/v1/accountnumberformats",
+									"protocol": "https",
+									"host": [
+										"core",
+										"gwocu",
+										"com"
+									],
+									"path": [
+										"fineract-provider",
+										"api",
+										"v1",
+										"accountnumberformats"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "Organization",
+			"item": [
+				{
+					"name": "List Offices",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "password",
+									"value": "password",
+									"type": "string"
+								},
+								{
+									"key": "username",
+									"value": "mifos",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Fineract-Platform-TenantId",
+								"value": "default",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://core.gwocu.com/fineract-provider/api/v1/offices",
+							"protocol": "https",
+							"host": [
+								"core",
+								"gwocu",
+								"com"
+							],
+							"path": [
+								"fineract-provider",
+								"api",
+								"v1",
+								"offices"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "List Savings Product",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "password",
+									"value": "password",
+									"type": "string"
+								},
+								{
+									"key": "username",
+									"value": "mifos",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Fineract-Platform-TenantId",
+								"value": "default",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://core.gwocu.com/fineract-provider/api/v1/savingsproducts",
+							"protocol": "https",
+							"host": [
+								"core",
+								"gwocu",
+								"com"
+							],
+							"path": [
+								"fineract-provider",
+								"api",
+								"v1",
+								"savingsproducts"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Savings Product",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "password",
+									"value": "password",
+									"type": "string"
+								},
+								{
+									"key": "username",
+									"value": "mifos",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Fineract-Platform-TenantId",
+								"value": "default",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"name\": \"Passbook Savings\",\r\n  \"shortName\": \"PBSV\",\r\n  \"description\": \"Daily compounding using Daily Balance, 5% per year, 365 days in year\",\r\n  \"currencyCode\": \"USD\",\r\n  \"digitsAfterDecimal\": 2,\r\n  \"inMultiplesOf\": 0,\r\n  \"locale\": \"en\",\r\n  \"nominalAnnualInterestRate\": \"5.0\",\r\n  \"interestCompoundingPeriodType\": 1,\r\n  \"interestPostingPeriodType\":4,\r\n  \"interestCalculationType\": 1,\r\n  \"interestCalculationDaysInYearType\": \"365\",\r\n  \"accountingRule\":\"1\",\r\n  \"charges\":[{\"id\":\"1\"}]\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://core.gwocu.com/fineract-provider/api/v1/savingsproducts",
+							"protocol": "https",
+							"host": [
+								"core",
+								"gwocu",
+								"com"
+							],
+							"path": [
+								"fineract-provider",
+								"api",
+								"v1",
+								"savingsproducts"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "List working days",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "password",
+									"value": "password",
+									"type": "string"
+								},
+								{
+									"key": "username",
+									"value": "mifos",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Fineract-Platform-TenantId",
+								"value": "default",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://core.gwocu.com/fineract-provider/api/v1/workingdays",
+							"protocol": "https",
+							"host": [
+								"core",
+								"gwocu",
+								"com"
+							],
+							"path": [
+								"fineract-provider",
+								"api",
+								"v1",
+								"workingdays"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Client",
+			"item": [
+				{
+					"name": "List clients",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "password",
+									"value": "password",
+									"type": "string"
+								},
+								{
+									"key": "username",
+									"value": "mifos",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Fineract-Platform-TenantId",
+								"value": "default",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://core.gwocu.com/fineract-provider/api/v1/clients",
+							"protocol": "https",
+							"host": [
+								"core",
+								"gwocu",
+								"com"
+							],
+							"path": [
+								"fineract-provider",
+								"api",
+								"v1",
+								"clients"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Client",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "password",
+									"value": "password",
+									"type": "string"
+								},
+								{
+									"key": "username",
+									"value": "mifos",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Fineract-Platform-TenantId",
+								"value": "default",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": " {\r\n\r\n                        \"firstname\": \"Richard\",\r\n                        \"lastname\": \"Dickson\",\r\n                        \"externalId\": \"786YYH7\",\r\n                        \"dateFormat\": \"dd MMMM yyyy\",\r\n                        \"locale\": \"en\",\r\n                        \"active\": true,\r\n                        \"activationDate\": \"18 February 2024\",\r\n                        \"submittedOnDate\":\"18 February 2024\",\r\n                        \"officeId\":1,\r\n                        \"savingsProductId\" : 1,\r\n                        \"address\":[\r\n                        {\r\n                        \"addressTypeId\": 805,\r\n                        \"isActive\": true,\r\n                        \"street\": \"rapchik\",\r\n                        \"stateProvinceId\": 800,\r\n                        \"countryId\": 802\r\n                        }\r\n                        ]\r\n                        }",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://core.gwocu.com/fineract-provider/api/v1/clients",
+							"protocol": "https",
+							"host": [
+								"core",
+								"gwocu",
+								"com"
+							],
+							"path": [
+								"fineract-provider",
+								"api",
+								"v1",
+								"clients"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get client by external id",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "password",
+									"value": "password",
+									"type": "string"
+								},
+								{
+									"key": "username",
+									"value": "mifos",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Fineract-Platform-TenantId",
+								"value": "default",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://core.gwocu.com/fineract-provider/api/v1/clients/external-id/786YYH7",
+							"protocol": "https",
+							"host": [
+								"core",
+								"gwocu",
+								"com"
+							],
+							"path": [
+								"fineract-provider",
+								"api",
+								"v1",
+								"clients",
+								"external-id",
+								"786YYH7"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Health Check",
+			"item": [
+				{
+					"name": "Health check",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://core.gwocu.com/fineract-provider/actuator/health",
+							"protocol": "https",
+							"host": [
+								"core",
+								"gwocu",
+								"com"
+							],
+							"path": [
+								"fineract-provider",
+								"actuator",
+								"health"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Information about the deployment",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://core.gwocu.com/fineract-provider/actuator/info",
+							"protocol": "https",
+							"host": [
+								"core",
+								"gwocu",
+								"com"
+							],
+							"path": [
+								"fineract-provider",
+								"actuator",
+								"info"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "System",
+			"item": [
+				{
+					"name": "Get Configuration",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "password",
+									"value": "password",
+									"type": "string"
+								},
+								{
+									"key": "username",
+									"value": "mifos",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Fineract-Platform-TenantId",
+								"value": "default",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://core.gwocu.com/fineract-provider/api/v1/configurations",
+							"protocol": "https",
+							"host": [
+								"core",
+								"gwocu",
+								"com"
+							],
+							"path": [
+								"fineract-provider",
+								"api",
+								"v1",
+								"configurations"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Codes",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "password",
+									"value": "password",
+									"type": "string"
+								},
+								{
+									"key": "username",
+									"value": "mifos",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Fineract-Platform-TenantId",
+								"value": "default",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://core.gwocu.com/fineract-provider/api/v1/codes",
+							"protocol": "https",
+							"host": [
+								"core",
+								"gwocu",
+								"com"
+							],
+							"path": [
+								"fineract-provider",
+								"api",
+								"v1",
+								"codes"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Code Values",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "password",
+									"value": "password",
+									"type": "string"
+								},
+								{
+									"key": "username",
+									"value": "mifos",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Fineract-Platform-TenantId",
+								"value": "default",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://core.gwocu.com/fineract-provider/api/v1/codes/1/codevalues",
+							"protocol": "https",
+							"host": [
+								"core",
+								"gwocu",
+								"com"
+							],
+							"path": [
+								"fineract-provider",
+								"api",
+								"v1",
+								"codes",
+								"1",
+								"codevalues"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Configuration",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "password",
+									"value": "password",
+									"type": "string"
+								},
+								{
+									"key": "username",
+									"value": "mifos",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Fineract-Platform-TenantId",
+								"value": "default",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n                \"enabled\":\"true\"\r\n               }",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://core.gwocu.com/fineract-provider/api/v1/configurations/31",
+							"protocol": "https",
+							"host": [
+								"core",
+								"gwocu",
+								"com"
+							],
+							"path": [
+								"fineract-provider",
+								"api",
+								"v1",
+								"configurations",
+								"31"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Organization",
+			"item": [
+				{
+					"name": "List Payment Types",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "password",
+									"value": "password",
+									"type": "string"
+								},
+								{
+									"key": "username",
+									"value": "mifos",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Fineract-Platform-TenantId",
+								"value": "default",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://core.gwocu.com/fineract-provider/api/v1/paymenttypes",
+							"protocol": "https",
+							"host": [
+								"core",
+								"gwocu",
+								"com"
+							],
+							"path": [
+								"fineract-provider",
+								"api",
+								"v1",
+								"paymenttypes"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Payment Type",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "password",
+									"value": "password",
+									"type": "string"
+								},
+								{
+									"key": "username",
+									"value": "mifos",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Fineract-Platform-TenantId",
+								"value": "default",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n\t\t\t\t\t\"name\":\"cash\",\r\n\t\t\t\t\t\"description\":\"cash payment type\",\r\n\t\t\t\t\t\"isCashPayment\":true,\r\n\t\t\t\t\t\"position\":1\r\n\t\t\t\t\t}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://core.gwocu.com/fineract-provider/api/v1/paymenttypes",
+							"protocol": "https",
+							"host": [
+								"core",
+								"gwocu",
+								"com"
+							],
+							"path": [
+								"fineract-provider",
+								"api",
+								"v1",
+								"paymenttypes"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Authentication Information",
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "password",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "mifos",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Fineract-Platform-TenantId",
+						"value": "default",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"password\": \"password\",\r\n  \"username\": \"mifos\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://core.gwocu.com/fineract-provider/api/v1/authentication",
+					"protocol": "https",
+					"host": [
+						"core",
+						"gwocu",
+						"com"
+					],
+					"path": [
+						"fineract-provider",
+						"api",
+						"v1",
+						"authentication"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

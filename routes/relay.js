@@ -10,13 +10,18 @@ var base_url = process.env.BASE_CONFIG_URL ;
 
 router.all("/", async (req, res) => {
   try {
+    const myHeaders = req.headers
     // req.body.destination must contains the destination URL
-    const destinationUrl = req.body.destination || "";
+    const destinationUrl = myHeaders["destination"] || "";
 
     if (!destinationUrl) {
       return res.status(400).json({ error: "Destination URL not provided" });
     }
 
+    
+    delete myHeaders['content-length'];
+    delete myHeaders['host'];
+    const url = myHeaders['destination'];;
 
     console.log ("WE ARE IN");
     console.log(req.method);
@@ -24,24 +29,21 @@ router.all("/", async (req, res) => {
     console.log(req.headers);
     
     console.log("DESTINATION");
-    console.log(req.body.destination);
-    const url = req.body.destination;
-    delete req.body.destination;
-    console.log("BODY")
-    console.log( req.method !== 'GET' ? JSON.stringify(req.body) : undefined,);
+    console.log(url);
     
-    
-    const myHeaders = req.headers
-  
-    // remove attributes from headers that may interfere with the relay
-    delete myHeaders['content-length'];
-    delete myHeaders['host'];
-
-    const response = await fetch(url, {
+    const allowedMethodsForBody = ["POST", "PUT", "PATCH"]; 
+    const fetchOptions = {
       method: req.method,
-      headers: myHeaders,
-      body: req.method !== 'GET' ? JSON.stringify(req.body) : undefined
-    });
+      headers: myHeaders
+    };
+    
+    if (allowedMethodsForBody.includes(req.method.toUpperCase())) {
+      fetchOptions.body = JSON.stringify(req.body);
+    }
+
+    
+
+    const response = await fetch(url, fetchOptions);
 
     const responseBody = await response.json(); // Parse response as JSON
 

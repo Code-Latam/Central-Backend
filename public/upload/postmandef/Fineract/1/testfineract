@@ -1,0 +1,33 @@
+{
+	"info": {
+		"_postman_id": "fbd68be1-70ba-45f0-93fc-24a33cbacc77",
+		"name": "export",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "25749966",
+		"_collection_link": "https://red-comet-433941.postman.co/workspace/Fineract~72493301-5f9c-4aa5-a7e2-c626925412d6/collection/25749966-fbd68be1-70ba-45f0-93fc-24a33cbacc77?action=share&source=collection_link&creator=25749966"
+	},
+	"item": [
+		{
+			"name": "Health check",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://core.gwocu.com/fineract-provider/actuator/health",
+					"protocol": "https",
+					"host": [
+						"core",
+						"gwocu",
+						"com"
+					],
+					"path": [
+						"fineract-provider",
+						"actuator",
+						"health"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
