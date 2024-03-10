@@ -25,6 +25,8 @@ const uploadapidefRoute = require("./routes/uploadapidef");
 const uploadapidef2Route = require("./routes/uploadapidef2");
 
 const explorerRoute = require("./routes/explorers");
+const yamlRoute = require("./routes/yamls");
+
 const workflowRoute = require("./routes/workflows");
 const productRoute = require("./routes/products");
 const taskRoute = require("./routes/tasks");
@@ -64,6 +66,7 @@ app.use("/api/upload", uploadRoute);
 app.use("/api/uploadapidef", uploadapidefRoute);
 app.use("/api/uploadapidef2", uploadapidef2Route);
 app.use("/api/explorer", explorerRoute);
+app.use("/api/yaml", yamlRoute);
 app.use("/api/workflow", workflowRoute);
 app.use("/api/product", productRoute);
 app.use("/api/task", taskRoute);

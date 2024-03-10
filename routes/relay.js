@@ -27,6 +27,8 @@ router.all("/", async (req, res) => {
     console.log(req.method);
     console.log("HEADERS");
     console.log(req.headers);
+    console.log("RECEIVED REQUEST BODY");
+    console.log(req.body)
     
     console.log("DESTINATION");
     console.log(url);
@@ -41,7 +43,8 @@ router.all("/", async (req, res) => {
       fetchOptions.body = JSON.stringify(req.body);
     }
 
-    
+    console.log("FETCH OPTIONS");
+    console.log(fetchOptions);
 
     const response = await fetch(url, fetchOptions);
 
@@ -51,18 +54,24 @@ router.all("/", async (req, res) => {
 
     console.log("RESPONSE HEADERS");
     console.log(response.headers);
+    console.log("HELLOOOOOOO");
     const responseHeaders = response.headers;
-
+    console.log("hello 2");
     if (responseHeaders) {
+      console.log("hello 3");
       // Iterate through the headers and set them on the response
-      Object.entries(responseHeaders).forEach(([headerName, headerValue]) => {
-        res.set(headerName, headerValue);
+      Object.entries(responseHeaders).forEach(([headerName, headerValue]) =>
+       { console.log(`HEADERNAME ${headerName}`)
+        // res.set(headerName, headerValue);
       });
     }
-
+    console.log("hello 5");
+    console.log(response.status);
 
     res.status(response.status).json(responseBody);
   } catch (err) {
+    console.log("error");
+    console.log(err);
     res.status(500).json(err);
   }
 });

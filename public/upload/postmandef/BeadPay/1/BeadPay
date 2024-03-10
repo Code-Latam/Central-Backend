@@ -1,0 +1,119 @@
+{
+	"info": {
+		"_postman_id": "caf52a9e-0c53-4e2b-b4d4-c2bbdd3ca821",
+		"name": "export test",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "25749966",
+		"_collection_link": "https://red-comet-433941.postman.co/workspace/POCKYT-Work-Space~a7046763-adde-4d20-8d27-90a99eab112a/collection/25749966-caf52a9e-0c53-4e2b-b4d4-c2bbdd3ca821?action=share&source=collection_link&creator=25749966"
+	},
+	"item": [
+		{
+			"name": "PRE-PAY-API",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"var crypto = require('crypto-js')\r",
+							"\r",
+							"var rawBody = pm.request.body.raw;\r",
+							"const requestBody = JSON.parse(rawBody);\r",
+							"\r",
+							"var myPOSParamObject = {\r",
+							"    merchantNo: pm.collectionVariables.get('merchantNo'),\r",
+							"    storeNo: pm.collectionVariables.get('storeNo'),\r",
+							"    transactionNo: requestBody.transactionNo,\r",
+							"    paymentBarcode: requestBody.paymentBarcode,\r",
+							"    vendor: requestBody.vendor\r",
+							"}\r",
+							"\r",
+							"// Calculate the VeriSign signature:\r",
+							"\r",
+							"var MySignature = CalculateSignature(pm.collectionVariables.get('MyToken'), myPOSParamObject);\r",
+							"\r",
+							"postman.setEnvironmentVariable(\"merchantNo\", myPOSParamObject.merchantNo);\r",
+							"postman.setEnvironmentVariable(\"storeNo\", myPOSParamObject.storeNo);\r",
+							"postman.setEnvironmentVariable(\"MySignature\", MySignature);\r",
+							"postman.setEnvironmentVariable(\"transactionNo\", myPOSParamObject.transactionNo);\r",
+							"postman.setEnvironmentVariable(\"paymentBarcode\", myPOSParamObject.paymentBarcode);\r",
+							"postman.setEnvironmentVariable(\"vendor\", myPOSParamObject.vendor);\r",
+							"\r",
+							"// function that calculates the signature according to Pockyt rules\r",
+							"function CalculateSignature(token,parameters)\r",
+							"{\r",
+							"    // calculate the hash value of the token\r",
+							"    \r",
+							"    // var ApiTokenHashvalue = CryptoJS.MD5(str_1 + str_2).toString();\r",
+							"    var ApiTokenHashvalue = crypto.MD5(token).toString();\r",
+							"    \r",
+							"    // order parameters alfabetically\r",
+							"    var SortedParams = sortObj(parameters);\r",
+							"    \r",
+							"    // Concatenate: add '&' between key and value pair and replace : for = \r",
+							"    var MyString = '' ;\r",
+							"    for (const [key, value] of Object.entries(SortedParams)) {\r",
+							"        MyString += (`${key}=${value}&`);}\r",
+							"\r",
+							"    //  add hash value of token at the and of the string\r",
+							"    MyString += ApiTokenHashvalue ;\r",
+							"\r",
+							"    // create the verifySign\r",
+							"\r",
+							"    const MySignature = crypto.MD5(MyString).toString();\r",
+							"\r",
+							"    return MySignature;\r",
+							"\r",
+							"    \r",
+							"// algabetical sort helper function\r",
+							"    function sortObj(obj) {\r",
+							"        return Object.keys(obj).sort().reduce(function (result, key) {\r",
+							"          result[key] = obj[key];\r",
+							"          return result;\r",
+							"        }, {});\r",
+							"      }\r",
+							"      \r",
+							"\r",
+							"}"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n        \"merchantNo\": \"{{merchantNo}}\",\r\n        \"storeNo\": \"{{storeNo}}\",\r\n        \"verifySign\": \"{{MySignature}}\",\r\n        \"transactionNo\": \"317818259578419040\",\r\n        \"paymentBarcode\": \"286521182446652715\",\r\n        \"vendor\": \"alipay\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://mapi.yuansfer.yunkeguan.com/app-instore/v3/prepay",
+					"protocol": "https",
+					"host": [
+						"mapi",
+						"yuansfer",
+						"yunkeguan",
+						"com"
+					],
+					"path": [
+						"app-instore",
+						"v3",
+						"prepay"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
