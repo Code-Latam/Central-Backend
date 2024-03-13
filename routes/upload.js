@@ -7,6 +7,8 @@ const {CSVLoader} = require("langchain/document_loaders/fs/csv");
 const {PDFLoader} = require("langchain/document_loaders/fs/pdf");
 const {DocxLoader} = require("langchain/document_loaders/fs/docx");
 const fs = require("fs");
+const path = require("path");
+
 
 // Create a storage engine
 const storage = multer.diskStorage({
@@ -79,7 +81,7 @@ router.post("/multiple-upload", upload.array("file", 50), (req, res) => {
           fs.unlink(path.join(dir, file), err => {
             if (err) {
               // Log the error and continue with the next file
-              console.error(`Error deleting file ${path.join(dir, file)}:`, err);
+              console.error('Error deleting file');
             }
           });
         }
