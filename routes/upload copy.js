@@ -6,20 +6,32 @@ const {TextLoader} = require("langchain/document_loaders/fs/text");
 const {CSVLoader} = require("langchain/document_loaders/fs/csv");
 const {PDFLoader} = require("langchain/document_loaders/fs/pdf");
 const {DocxLoader} = require("langchain/document_loaders/fs/docx");
-const fs = require("fs");
 
 // Create a storage engine
 const storage = multer.diskStorage({
   // Specify the destination folder
   destination: (req, file, cb) => {
-    const mypath = "public/upload/chatbots/" + req.body.clientNr + "/" + req.body.chatbotKey
-    console.log("PATH");
-    console.log(mypath);
-   
+    
+    cb(null, "upload");
+  },
+  // Specify the filename
+  filename: (req, file, cb) => {
+    cb(null, file.originalname);
+  },
+});
+
+const storage = multer.diskStorage({
+  // Specify the destination folder
+    
+
+  destination: (req, file, cb) => {
+    const mypath = "public/upload/postmandef/" + req.body.clientNr +  "/" + req.body.explorerId
+    
+    // Create directory if it does not exist
     if (!fs.existsSync(mypath)) {
       fs.mkdirSync(mypath, { recursive: true });
     }
-    
+
     cb(null, mypath);
   },
   // Specify the filename
@@ -30,19 +42,14 @@ const storage = multer.diskStorage({
 
 
 
-
-
 // Create a multer middleware
 const upload = multer({ storage: storage });
 
 // Use the multer middleware in your router
 router.post("/multiple-upload", upload.array("file", 50), (req, res) => {
-  const directory = "public/upload/chatbots/" + req.body.clientNr + "/" + req.body.chatbotKey; // the directory you want to delete files from
-
-         
   // Handle the API call here
   const loader = new DirectoryLoader(
-    directory,
+    "upload/",
     {
       ".json": (path) => new JSONLoader(path),
       ".txt": (path) => new TextLoader(path),
@@ -67,27 +74,6 @@ router.post("/multiple-upload", upload.array("file", 50), (req, res) => {
     console.log(mydocsarray[0]);
     console.log(mysourcesarray[0]);
 
-
-    function deleteDirectoryContents(dir) {
-      fs.readdir(dir, (err, files) => {
-        if (err) {
-          console.error("Error reading directory contents:", err);
-          return; // Exit the function if we can't read the directory
-        }
-    
-        for (const file of files) {
-          fs.unlink(path.join(dir, file), err => {
-            if (err) {
-              // Log the error and continue with the next file
-              console.error(`Error deleting file ${path.join(dir, file)}:`, err);
-            }
-          });
-        }
-      });
-    }
-    
-
-
     const myapibody = { clientNr:req.body.clientNr,
                         gwoken: req.body.gwoken,
                         chatbotMaster: req.body.chatbotMaster,
@@ -109,7 +95,24 @@ router.post("/multiple-upload", upload.array("file", 50), (req, res) => {
         body: JSON.stringify(myapibody)
         })
         .then(response => {
-          deleteDirectoryContents(directory);
+
+          const fs = require("fs");
+          const path = require("path");
+
+          const directory = "upload"; // the directory you want to delete files from
+
+          fs.readdir(directory, (err, files) => {
+            if (err) {console.log("There was an error reading directory")};
+  
+            for (const file of files) {
+            fs.unlink(path.join(directory, file), (err) => {
+            if (err) {console.log("There was an error deleting")};
+            });
+            }
+            });
+  
+
+
 
           res.status(200).json("Files successfuly uploaded!" );
           return
