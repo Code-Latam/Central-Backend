@@ -77,6 +77,23 @@ router.post("/query", async (req, res) => {
   }
 })
 
+router.post("/sync", async (req, res) => {
+  try {
+    const url = base_url + "/api/folder/sync";
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(req.body)
+    });
+    const myresponse = await response.json();
+    res.status(response.status).json(myresponse);
+  } catch (err) {
+    res.status(500).json(err)
+  }
+})
+
 
 
 
