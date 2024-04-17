@@ -1,0 +1,5821 @@
+openapi: 3.0.3
+# DO NOT FORGET TO CREATE CLEANUP VERSION AND COPY TO RESOURCES!
+info:
+  title: C360 API
+  version: 2023.11.26.20.30
+  description: |
+    C360 API for the Alluvial platform
+    
+    <details>
+    <summary>CHANGELOG</summary>
+    <p>
+    
+    ## Sprint 29
+    ### What's new
+    * `Customer` extended with `reinforcedProcessFlag` attribute.
+    * `Account` extended with `externalId' and 'accountType' attributes.\
+       Based on extension the `IBAN` is not required anymore, because it's depends on `accountType`.
+
+    ## Sprint 28
+    ### What's new
+    * `Persona` extended with `declarationsId` for support response UUID's only 
+
+    ## Sprint 26
+    ### What's new
+    * extend the following object references with oneOf UUID or List of UUIDs about query
+      * IdentityDocument.locations
+      * User.pep
+
+    ## Sprint 25
+    ### What's new
+    * `enum_identityDocumentType` extended with `LEGACY_ID` value.
+    * `pep` added to `user` schema.
+    * `statementFrequency` added to `account` schema.
+    * `locations` added to `IdentityDocument` schema.
+
+    ## Sprint 24
+    ### What's new
+    * `shortId` and 'email' attribute added to `Customer` schema.
+    * `shortId` attribute added to `User` schema.
+    * `acsIdentity` attribute added to `User` schema.
+    * System fields (`_createdAt`, `_createdBy`, `_updatedAt`, `_updatedBy`) added to schema definitions.
+    * `Persona` extended with `declarations` object.
+    
+    ### Fixed
+    * Fix the reference for `IdentityDocuments` within `User` schema. 
+
+    ## 2023-06-22 - sprint 20
+    ### What's new
+    * `like` search is extended to numbers, dates and system attributes too.
+
+    ## 2023-06-22 - sprint 20
+    ### What's new
+    * `like` search is available for almost all top level attributes.\
+    `like` search is case insensitive and it is possible to use `*` (any character) or `?` (one character) as wildcard.\
+    Not supported for `number`, `date, `uuid` and system (uuid, '_xxx') attributes.
+    
+    
+    ## 2023-06-18 - sprint 20
+    ### What's new
+    * Device delete (`deleteDevice`) operation added. The object will be deleted without any checking. 
+    * PersonaRole delete (`deletePersonaRole`) operation added. The object will be deleted without any checking.
+
+    ## 2023-06-14 - sprint 20
+    ### What's new
+    * Invitation.registrationId renamed to senderRegistrationId and not mandatory anymore.
+    * Add new Invitation.receiverRegistrationId attribute.
+    * Add new endpoint `updateInvitation` to update Invitation registration Ids.
+    * Invitation's required fields are updated.
+    * Update documentation about ScoringLimit.amount.
+    
+    ## 2023-05-31 - sprint 19
+    ### Removed
+    * Removed `lastModifiedBy` from `Partner` schema. 
+    ### Added
+    * Added globally the `_createdBy` and `_updatedBy` attributes to all schemas. These attributes are references to the `User` who created or updated the object. The id has come from the IDToken. 
+    
+    ## 2023-05-23 - sprint 18
+    ### Added
+    * `Customer` extended with Scoring related attributes.\
+       These fields are not mandatory, right now for preserve backward compatibility. Later they will be mandatory.
+    ### Removed
+    * Some pattern validation.
+
+    ## 2023-05-22 - sprint 18
+    ### Added
+    * `Device` appended with `pushArn` attribute.
+
+    ## 2023-05-11 - sprint 17
+    ### Added
+    * Can create `Device` without User.
+    
+    ## 2023-05-10 - sprint 17
+    ### Added
+    * Can assign `Device` to `User` with `POST /api/v1/users/{userId}/devices/{deviceId}`
+
+    ## 2023-04-27 - sprint 17
+    ### Added
+    * Persona entity extended with `emailVerified` and `phoneVerified` required attributes.\
+    Test scripts must be updated to set these attributes for existing Personas and upload them to the test environment.
+    * Delete operation for Partner entity  
+    
+    ## 2023-04-27 - sprint 16
+    ### Modify
+    * Review and fix `tag` usage
+    * Add missing (dummy) examples
+    * Review `operationId` names
+
+    ## 2023-04-26 - sprint 16
+    ### Modify
+    * Invitation structure updated.
+    
+    ## 2023-04-25 - sprint 16
+    ### Add
+    * Add Invitation related operations.
+
+    ## 2023-04-24 - sprint 16
+    ### Modify
+    * Update Card, Account, Customer, User OpenAPI models based on DiPocket integration.
+    * Add `temporaryUserId` to `User` schema about ForgeRock User join.
+    * Extract all enum into standalone schema definition
+    
+    ## 2023-04-08 - sprint 15
+    ### Added
+    * Card related operations
+    ### Modified
+    * `xxxUpdate` scehmas modified - `required` restrictions removed
+    
+    ## 2023-04-04 - sprint 14
+    ### Added
+    * `pushToken` for `Device`
+    * `Partner` schema and operations
+    * PATCH operation for `account`, `customer`, `device`, `persona`, `personaRole`, `partner`, `role`, `subscriptionPackage`, `user` schemas.
+    * `_notexists` query parameter for `/[object]` and `/[object]/[id]/[anotherObject]` GET endpoints\
+    `_notexists` query parameter can be used to filter out objects that do not have a relationship with a specific object.\
+    Only one object can be specified in the query parameter.\
+    Initially, developed for querying Personas without Roles by Company.\
+    `GET /api/v1/customers/:customerId/personas?_notexists=personaRoles`
+    
+    ### Breaking change
+    * `includes` query parameter renamed to `_includes`. The `includes` query parameter is still available, but it is deprecated.
+    
+    ## 2023-03-xx - part of sprint 13
+    ### Breaking change
+    * deprecated endpoints removed `/xxx` and `/api/xxx`. Only `/api/v1/**` and `/webhook/**` is available.
+    ### Modified
+    * It is possible to search based on any top-level attribute with exact match. There is no support for similarity,
+    differences in long or short accents, or double character differences. The result is always an array. If there is no
+    match, then the array will be empty. The result can be sorted and paged in the usual way. Initially, developed for
+    User 4T query.
+    ```
+    GET /api/v1/users?firstName=Máté&lastName=Havasi&mothersMaidenName=Anyja Neve&placeOfBirth=Budapest&dateOfBirth=1982-08-02
+    ```
+    ### Modified
+    * User patch defined. It is possible to update only the selected attributes of the user.
+    
+    ## 2023-03-06 - sprint 12
+    ### Added
+    * For pageable queries extended with `X-query-**` headers. See `Design style` section.
+    * Sorting extended with multiple fields. See `Design style` section.
+    
+    ## 2023-02-23 - part of sprint 12
+    ### Changed
+    * `Device` and `DeviceCreate` schemas updated
+    * `LoginSuccess` schema redefined and reused in `updateDeviceLoginSuccess` operation
+    ### Removed
+    * `PUT /api/v1/devices/installationId/{installationId}/loginSuccess` path removed
+    ## 2023-02-22 - part of sprint 12
+    ### Added
+    * added `roles` related operations
+    ### Breaking change
+    * url changed from `/` to `/api/v1` e.g. `/api/v1/customers`
+    * `role` within `persona` removed. It is now a separate entity.
+    ### Removed
+    * `enumRole` schema removed
+    
+    ## 2023-02-20 - part of sprint 12
+    ### Added
+    * added `SubscriptionPackageCreate` schema
+    * added `MoneyAmountCreate` schema
+    * added `AccountCreate` schema
+    * added `RepresentativeCreate` schema
+    * added `ActivityClassificationCreate` schema
+    
+    ### Changed
+    * typo fixed about `ListOfUUIDs`
+    * `role` added to `PersonaCreate`
+    * `Device` structure updated, extended
+    * a number format fixed within examples
+    * newly added xxxCreate schemas are used in the corresponding POST operations
+    
+    ### Breaking change
+    * `Device` `state` renamed to `status`, enum values redefined
+    
+    
+    ## 2023-02-16 - sprint 11
+    ### Added
+    * Add assignDeviceForUser operation
+    * Add getUserAssignedDevice operation
+    * Add getUserAssignedDevices operation
+    * Defined `Device` related schemas
+    * '#/components/responses/Devices'
+    * '#/components/responses/Device'
+    * Add updateDeviceLoginSuccess operation
+    * Add `#/components/schemas/ListOfUUIDs' schema
+    * Add `#/components/schemas/Personas' schema
+    * Add `#/components/schemas/Users' schema
+    * Add `#/components/schemas/Customers' schema
+    * Add `#/components/schemas/SubscriptionPackages' schema
+    * Add `#/components/schemas/Accounts' schema
+    * Add `#/components/schemas/Devices' schema
+    
+    ### Changed
+    * `#/components/schemas/User' changed
+    * `personas` can be `#/components/schemas/ListOfUUIDs' or `#/components/schemas/Personas'
+    * `#/components/schemas/Customer' changed
+    * `personas` can be `#/components/schemas/ListOfUUIDs' or `#/components/schemas/Personas'
+    * `accounts` can be `#/components/schemas/ListOfUUIDs' or `#/components/schemas/Accounts'
+    * `#/components/schemas/Persona' changed
+    * add `role` attribute
+    * `#/components/schemas/SubscriptionPackage' changed
+    * add `transactionalAmountFeeFix` attribute
+    
+    ## 2023-02-06
+    ### Breaking changes
+    * Representative.mode `INDEPENDENT` replaced with `SOLE`
+
+    </details>    
+    <details>
+    <summary>Design stlye</summary>
+    <p>
+    
+    ## Naming conventions
+    * Resource names are always plural, using a lower camel case.
+    * Attributes names are always singular, using a lower camel case.
+    * Enumerate values are always upper case, using underscore to separate words.
+    * Openation IDs are always a lower camel case.
+    ## Operations
+    ### `GET /objects`
+    **operationId**: listObjects\
+          **returns** : list of objects\
+    **HTTP code**:
+            200 OK: independently of the number of objects in the list
+    
+    ### `GET /objects/{id}`
+          **operationId** : getObject\
+          **returns** : one object\
+    **HTTP code**:
+            200 OK: if the object exists\
+    **HTTP code**:
+            404 Not Found: if the object does not exist
+    
+    ### `GET /objects/{field}/{fieldValue}`
+          **operationId** : getUniqueObject\
+          **returns** : one object\
+    **HTTP code**:
+            200 OK: if the object exists\
+    **HTTP code**:
+            404 Not Found: if the object does not exist
+    
+    ### `POST /objects`
+          **operationId** : createObject
+          **returns** : uuid\
+    **HTTP code**:
+            201 Created: if the object was created\
+    **HTTP code**:
+            409 Conflict: if the object already exists
+    
+    ### `PATCH /objects/{id}`
+          **operationId** : updateObject
+          **returns** : uuid\
+    **HTTP code**:
+            204 No Content: if the object was updated successfully \
+    **HTTP code**:
+            404 Not Found: if the object does not exist \
+    **HTTP code**:
+            409 Conflict: if the object has conflict with the request \
+    **HTTP code**:
+            422 Unprocessable Entity: if the object has validation errors
+    
+    ## Unique identifiers
+    Every resource has a unique identifier.
+    The identifier is a string and it is generated by the server.
+    The identifier is used in the URL of the resource.
+    The identifier is unique within the resource type.
+    The identifier is not guaranteed to be unique across resource types.
+    The unique identifier name is always `uuid` within the object and `xxxId` when reference the object.
+    
+    ## Pagination
+    Pagination is available for all list operations. The default limit is 20 elements.
+    You can use paging if you result in getting big or need paging support.
+    
+    Paging support currently is not cached, not hold cursors, etc. Every request recalculated, always.
+    
+    Parameters
+          - `size`: size of the page (start from one) - can be used alone
+          - `page`: which page get as a result (zero based) - must be used with size
+    
+    ```
+    GET /{entityName}?size=10&page=5
+    GET /{entityName}?size=1
+    ```
+    
+          If the result is paged, then the following headers will be set:
+            - `X-query-total-elements`: total number of elements
+            - `X-query-total-pages`: total number of pages
+            - `X-query-page-size`: size of the page
+            - `X-query-page-number`: number of the page
+            - `X-query-sort`: sort order
+    
+    ## Filtering
+    Filtering is available for all list operations.
+    You can filter the result only the queried top level entity fields.
+    `like` search is case insensitive and it is possible to use `*` (any character) or `?` (one character) as wildcard.
+
+    ``` 
+    
+    ```
+    GET /{entityName}?{fieldName}={fieldValue}&{otherFieldName}={otherFieldValue}
+    GET /{entityName}/{id}/{nestedEntityName}?{nestedFieldName}={nestedFieldValue}
+    GET /{entityName}?{fieldName}={fieldValue}&{otherFieldName}=*likevalue
+    GET /{entityName}?{fieldName}={fieldValue}&{otherFieldName}=likevalue*
+    GET /{entityName}?{fieldName}={fieldValue}&{otherFieldName}=like*value
+    GET /{entityName}?{fieldName}={fieldValue}&{otherFieldName}=like?value
+    ```
+    
+    ## Sorting
+    Sorting is available for all list operations.
+    You can sort the result with the queried top-level entity fields.
+    
+    ```
+    GET /{entityName}?sort={fieldName}{sortModifiers}
+    GET /{entityName}/{id}/{nestedEntityName}?sort={nestedFieldName}{sortModifiers}
+    ```
+    Sorting modifiers can be ":ASC" (asceding - default) or ":DESC" (descending).
+    
+    ```
+    GET /{entityName}?sort={fieldName}:DESC,{anotherFieldName}:ASC,{yetAnotherFieldName}
+    ```
+    
+          In-build fields can use it with sorting:
+            - `_createdAt`
+            - `_updatedAt`
+            - `uuid`
+    
+    ## Control returned data
+    ### Includes
+    Can be used for every query.
+    
+    When the Top-Level Entity or the Nested entity has many Nested entities, but this information is not needed, or we do not want to get back (e.g. data protection rules), we can control which nested entities will be included in the result.
+    
+    If “_includes” parameter is not provided, then every nested entity will be presented within the result.
+    
+    Do not include any nested entity
+    
+    ```
+    GET /{entityName}?_includes
+    ```
+    Include the “nestedEntity” entities
+    
+    ```
+    GET /{entityName}?_includes=nestedEntity
+    ```
+    Include the “nestedEntity” and “otherNestedEntity” entities
+    
+    ```
+    GET /{entityName}?_includes=nestedEntity,otherNestedEntity
+    ```
+    Include the "_createdBy" and "_updatedBy" nested entities as `User`
+    
+    ```
+    GET /{entityName}?_includes=_
+    ```
+    
+    ## HTTP return codes
+          - 200 OK - The request was successful
+          - 201 Created - The request was successful and a new resource was created
+          - 204 No Content - The request was successful but there is no content to return
+          - 400 Bad Request - The request was malformed
+          - 401 Unauthorized - The request was not authorized
+          - 403 Forbidden - The request was not authorized
+          - 404 Not Found - The requested resource was not found
+          - 405 Method Not Allowed - The requested method is not allowed for the resource
+          - 409 Conflict - The request could not be processed because of conflict in the current state of the resource
+          - 415 Unsupported Media Type - The content type of the request entity is not supported
+          - 422 Unprocessable Entity - The request was well-formed but was unable to be followed due to semantic errors
+          - 429 Too Many Requests - The request was rejected because the rate limit was exceeded
+          - 500 Internal Server Error - An unexpected error occurred on the server
+          - 503 Service Unavailable - The server is currently unavailable
+    
+    ## Error handling
+    Application will be using the RFC 7807 (problem detail) to help developers, integrators with useable, meaningful error messages.
+    
+          example:
+    
+    ```
+    {
+     "type": "https://github.com/AlluvialCloud/errors/entity-not-found",
+     "title": "Entity users with id cb9cc0da-accf-453a-8b96-9efe18108f5 not found",
+     "status": 404,
+     "instance": "/users/cb9cc0da-accf-453a-8b96-9efe18108f5",
+     "errorCategory": "Generic",
+     "timestamp": "2023-01-23T22:06:42.034114167Z",
+     "entity": "users",
+     "id": "cb9cc0da-accf-453a-8b96-9efe18108f5"
+    }
+    ```
+    
+    ## Security
+    TODO document security
+    
+    ## Rate limiting
+    TODO document rate limiting
+    
+    ## Caching
+    TODO document caching
+    
+    ## References:
+          - https://binx.atlassian.net/wiki/spaces/B1/pages/1767997445/C360
+    
+    ## Schema validation; structures
+          We use many schema validation tools, like:
+            - IBM OpenAPI Validator: https://github.com/IBM/openapi-validator
+            - Swagger Editor: https://editor.swagger.io/
+            - Stoplight: https://stoplight.io/
+            - IntelliJ built-in plugins
+            - Spectral: https://stoplight.io/open-source/spectral
+    
+    Unfortunately, none of the tools can validate examples for inheritance or oneOf/allOf structures.
+    
+    Every response entity object is inherited from `AbstractEntity` object. We don't apply `allOf` in the schema because of a lack of support for validation.
+    
+    Some response object contains `oneOf` required attributes (e.g. `userId` or `user`), but we don't apply `oneOf` in the schema because of a lack of support for validation.
+    In that case, we just added a comment in the `required` section of the schema.
+    
+    
+    </details>
+
+  contact:
+    name: Alluvial
+    email: alluvial@dpc.hu
+    url: 'https://alluvial.cloud'
+  license:
+    name: Apache 2.0
+    url: 'https://www.apache.org/licenses/LICENSE-2.0.html'
+servers:
+  - url: 'http://localhost:8080'
+    description: DEV server
+tags:
+  - name: Account
+    description: Account related operations
+  - name: Card
+    description: Bankcard related operations
+  - name: Customer
+    description: Customer related operations
+  - name: Device
+    description: Device related operations
+  - name: Invitation
+    description: Invitation related operations
+  - name: Partner
+    description: Partner related operations
+  - name: Persona
+    description: Persona related operations
+  - name: User
+    description: User related operations
+paths:
+  /api/v1/accounts:
+    get:
+      operationId: listAccounts
+      description: |
+        List Accounts\
+        You can use `_notexists` and `_includes` query parameters.\
+        The following entities can be used with `_notexists`
+        * `customers`
+        * `subscriptionPackages`               
+
+        The following entities can be used with `_includes`
+        * `customers`
+        * `subscriptionPackages`               
+
+      tags:
+        - Account
+      responses:
+        '200':
+          $ref: '#/components/responses/Accounts'
+        '404':
+          $ref: '#/components/responses/Problem404'
+        
+  /api/v1/accounts/{accountId}:
+    parameters:
+      - $ref: '#/components/parameters/accountId'
+    get:
+      operationId: getAccount
+      description: Retrieve an account by ID
+      tags:
+        - Account
+      responses:
+        '200':
+          $ref: '#/components/responses/Account'
+        '404':
+          $ref: '#/components/responses/Problem404'
+        
+    patch:
+      operationId: updateAccount
+      description: Update Account's top level properties.
+      tags:
+        - Account
+      requestBody:
+        $ref: '#/components/requestBodies/AccountUpdate'
+      responses:
+        '204':
+          description: Account updated
+        
+
+  /api/v1/accounts/{accountId}/cards:
+    parameters:
+      - $ref: '#/components/parameters/accountId'
+    get:
+      operationId: listAccountCards
+      description: |
+        List account's cards\
+        The following entities can be used with `_includes`
+        * `accounts`
+        * `cardLimits`
+        * `customers`
+        * `users`
+      tags:
+        - Account
+        - Card
+      responses:
+        '200':
+          $ref: '#/components/responses/Cards'
+        '404':
+          $ref: '#/components/responses/Problem404'
+        
+
+  /api/v1/accounts/{accountId}/cards/{cardId}:
+    parameters:
+      - $ref: '#/components/parameters/accountId'
+      - $ref: '#/components/parameters/cardId'
+    get:
+      operationId: getAccountCard
+      description: |
+        Retrieve an account's card by ID\
+        The following entities can be used with `_includes`
+        * `accounts`
+        * `cardLimits`
+        * `customers`
+        * `users`
+      tags:
+        - Account
+        - Card
+      responses:
+        '200':
+          $ref: '#/components/responses/Card'
+        '404':
+          $ref: '#/components/responses/Problem404'
+        
+
+  /api/v1/accounts/iban/{iban}:
+    parameters:
+      - $ref: '#/components/parameters/iban'
+    get:
+      operationId: getAccountByIban
+      description: Retrieve an account by IBAN
+      tags:
+        - Account
+      responses:
+        '200':
+          $ref: '#/components/responses/Account'
+        '404':
+          $ref: '#/components/responses/Problem404'
+        
+
+  /api/v1/accounts/iban/{iban}/subscriptionPackage:
+    parameters:
+      - $ref: '#/components/parameters/iban'
+    get:
+      operationId: listAccountSubscriptionPackagesByIban
+      description: Retrieve an account's subscription packages by IBAN
+      tags:
+        - Account
+      responses:
+        '200':
+          $ref: '#/components/responses/SubscriptionPackage'
+        '404':
+          $ref: '#/components/responses/Problem404'
+        
+
+  /api/v1/amount/{amountId}:
+    parameters:
+      - $ref: '#/components/parameters/amountId'
+    get:
+      operationId: getAmount
+      description: Retrieve an amount by ID
+      tags:
+        - Account
+      responses:
+        '200':
+          $ref: '#/components/responses/MoneyAmount'
+        '404':
+          $ref: '#/components/responses/Problem404'
+        
+    patch:
+      operationId: updateAmount
+      description: Update Amount's top level properties.
+      tags:
+        - Account
+      requestBody:
+        $ref: '#/components/requestBodies/MoneyAmountUpdate'
+      responses:
+        '204':
+          description: Amount updated
+        
+
+
+  /api/v1/cards:
+    post:
+      operationId: createCard
+      description: Create card
+      tags:
+        - Card
+      requestBody:
+        $ref: '#/components/requestBodies/CardCreate'
+      responses:
+        '201':
+          $ref: '#/components/responses/ObjectCreated'
+        
+    get:
+      operationId: listCards
+      description: |
+        List Cards\
+        You can use `_notexists` and `_includes` query parameters.\
+        The following entities can be used with `_notexists`
+        * `activityClassifications`
+        * `representatives`
+        * `accounts`
+        * `personas`
+
+        The following entities can be used with `_includes`
+        * `activityClassifications`
+        * `representatives`
+        * `accounts`
+        * `personas`
+          * `personaRoles`
+            * `roles`
+      tags:
+        - Card
+      parameters:
+        - name: taxNumber
+          in: query
+          description: Query cards by Tax number
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          $ref: '#/components/responses/Cards'
+        
+  /api/v1/cards/{cardId}:
+    parameters:
+      - $ref: '#/components/parameters/cardId'
+    get:
+      operationId: getCard
+      description: |
+        Retrieve a card.\
+        You can use `_includes` query parameters.\
+        The following entities can be used with `_includes`
+        * `activityClassifications`
+        * `representatives`
+        * `accounts`
+        * `personas`
+          * `personaRoles`
+            * `roles`
+      tags:
+        - Card
+      responses:
+        '200':
+          $ref: '#/components/responses/Card'
+        '404':
+          $ref: '#/components/responses/Problem404'
+        
+    patch:
+      operationId: updateCard
+      description: Update Card's top level properties.
+      tags:
+        - Card
+      requestBody:
+        $ref: '#/components/requestBodies/CardUpdate'
+      responses:
+        '204':
+          description: Card updated
+        
+  /api/v1/cards/{cardId}/cardLimits:
+    parameters:
+      - $ref: '#/components/parameters/cardId'
+    get:
+      operationId: listCardLimits
+      description: List card limits
+      tags:
+        - Card
+      responses:
+        '200':
+          $ref: '#/components/responses/CardLimits'
+        
+    post:
+      operationId: createCardLimit
+      description: Add new Card limit
+      tags:
+        - Card
+      requestBody:
+        $ref: '#/components/requestBodies/CardLimitCreate'
+      responses:
+        '201':
+          $ref: '#/components/responses/ObjectCreated'
+        
+  /api/v1/cards/{cardId}/cardLimits/{cardLimitId}:
+    parameters:
+      - $ref: '#/components/parameters/cardId'
+      - $ref: '#/components/parameters/cardLimitId'
+    get:
+      operationId: getCardCardLimit
+      description: Retrieve a card limit
+      tags:
+        - Card
+      responses:
+        '200':
+          $ref: '#/components/responses/CardLimit'
+        
+    patch:
+      operationId: updateCardCardLimit
+      description: Update Card limit's top level properties.
+      tags:
+        - Card
+      requestBody:
+        $ref: '#/components/requestBodies/CardLimitUpdate'
+      responses:
+        '204':
+          description: Card limit updated
+        
+  /api/v1/cardLimits/{cardLimitId}:
+    parameters:
+      - $ref: '#/components/parameters/cardLimitId'
+    get:
+      operationId: getCardLimit
+      description: Retrieve a card limit
+      tags:
+        - Card
+      responses:
+        '200':
+          $ref: '#/components/responses/CardLimit'
+        
+    patch:
+      operationId: updateCardLimit
+      description: Update Card limit.
+      tags:
+        - Card
+      requestBody:
+        $ref: '#/components/requestBodies/CardLimitUpdate'
+      responses:
+        '204':
+          description: Card limit updated
+        
+
+  /api/v1/customers:
+    post:
+      operationId: createCustomer
+      description: Create customer
+      tags:
+        - Customer
+      requestBody:
+        $ref: '#/components/requestBodies/CustomerCreate'
+      responses:
+        '201':
+          $ref: '#/components/responses/ObjectCreated'
+        
+    get:
+      operationId: listCustomers
+      description: |
+        List Customers\
+        You can use `_notexists` and `_includes` query parameters.\
+        The following entities can be used with `_notexists`
+        * `activityClassifications`
+        * `representatives`
+        * `accounts`
+        * `personas`
+
+        The following entities can be used with `_includes`
+        * `activityClassifications`
+        * `representatives`
+        * `accounts`
+        * `personas`
+          * `personaRoles`
+            * `roles`
+      tags:
+        - Customer
+      parameters:
+        - name: taxNumber
+          in: query
+          description: Query customers by Tax number
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          $ref: '#/components/responses/Customers'
+        
+  /api/v1/customers/{customerId}:
+    parameters:
+      - $ref: '#/components/parameters/customerId'
+    get:
+      operationId: getCustomer
+      description: |
+        Retrieve a customer.\
+        You can use `_includes` query parameters.\
+        The following entities can be used with `_includes`
+        * `activityClassifications`
+        * `representatives`
+        * `accounts`
+        * `personas`
+          * `personaRoles`
+            * `roles`
+      tags:
+        - Customer
+      responses:
+        '200':
+          $ref: '#/components/responses/Customer'
+        '404':
+          $ref: '#/components/responses/Problem404'
+        
+    patch:
+      operationId: updateCustomer
+      description: Update Customer's top level properties.
+      tags:
+        - Customer
+      requestBody:
+        $ref: '#/components/requestBodies/CustomerUpdate'
+      responses:
+        '204':
+          description: Customer updated
+        
+    delete:
+      tags:
+        - Customer
+      operationId: deleteCustomer
+      description: Delete customer
+      responses:
+        '204':
+          description: Customer deleted
+
+  /api/v1/customers/{customerId}/accounts:
+    parameters:
+      - $ref: '#/components/parameters/customerId'
+    get:
+      operationId: listCustomerAccounts
+      description: |
+        Retrieve a customer's accounts\
+        You can use `_notexists` and `_includes` query parameters.\
+        The following entities can be used with `_notexists`
+        * `customers`
+        * `subscriptionPackages`               
+
+        The following entities can be used with `_includes`
+        * `customers`
+        * `subscriptionPackages`               
+
+      tags:
+        - Account
+        - Customer
+      responses:
+        '200':
+          $ref: '#/components/responses/Accounts'
+        '404':
+          $ref: '#/components/responses/Problem404'
+        
+    post:
+      operationId: addAccountToCustomer
+      description: Add an account to a customer
+      tags:
+        - Account
+        - Customer
+      requestBody:
+        $ref: '#/components/requestBodies/AccountCreate'
+      responses:
+        '201':
+          $ref: '#/components/responses/ObjectCreated'
+        '404':
+          $ref: '#/components/responses/Problem404'
+        
+  /api/v1/customers/{customerId}/accounts/{accountId}:
+    parameters:
+      - $ref: '#/components/parameters/customerId'
+      - $ref: '#/components/parameters/accountId'
+    get:
+      operationId: getCustomerAccount
+      description: Retrieve a customer's account
+      tags:
+        - Account
+        - Customer
+      responses:
+        '200':
+          $ref: '#/components/responses/Account'
+        '404':
+          $ref: '#/components/responses/Problem404'
+        
+
+
+  /api/v1/customers/{customerId}/cards:
+    parameters:
+      - $ref: '#/components/parameters/customerId'
+    get:
+      operationId: listCustomerCards
+      description: |
+        Retrieve a Customer's Cards.\
+        The following entities can be used with `_includes`
+        * `accounts`        
+        * `cardLimits`
+        * `customers`
+        * `users`
+      tags:
+        - Card
+        - Customer
+      responses:
+        '200':
+          $ref: '#/components/responses/Cards'
+        '404':
+          $ref: '#/components/responses/Problem404'
+        
+  /api/v1/customers/{customerId}/cards/{cardId}:
+    parameters:
+      - $ref: '#/components/parameters/cardId'
+      - $ref: '#/components/parameters/customerId'
+    get:
+      operationId: getCustomerCard
+      description: |
+        Retrieve a Customer's Card.\
+
+        The following entities can be used with `_includes`
+        * `accounts`        
+        * `cardLimits`
+        * `customers`
+        * `users`
+      tags:
+        - Card
+        - Customer
+      responses:
+        '200':
+          $ref: '#/components/responses/Card'
+        '404':
+          $ref: '#/components/responses/Problem404'
+        
+
+  /api/v1/customers/{customerId}/invitations:
+    parameters:
+      - $ref: '#/components/parameters/customerId'
+    get:
+      operationId: listCustomerInvitations
+      description: |
+        Retrieve a Customer's Invitations.\
+        The following entities can be used with `_includes`
+        * `customers`
+      tags:
+        - Invitation
+        - Customer
+      responses:
+        '200':
+          $ref: '#/components/responses/Invitations'
+        '404':
+          $ref: '#/components/responses/Problem404'
+        
+  /api/v1/customers/{customerId}/invitations/{invitationId}:
+    parameters:
+      - $ref: '#/components/parameters/invitationId'
+      - $ref: '#/components/parameters/customerId'
+    get:
+      operationId: getCustomerInvitation
+      description: |
+        Retrieve a Customer's Invitation.\
+
+        The following entities can be used with `_includes`
+        * `customers`
+      tags:
+        - Invitation
+        - Customer
+      responses:
+        '200':
+          $ref: '#/components/responses/Invitation'
+        '404':
+          $ref: '#/components/responses/Problem404'
+        
+
+  /api/v1/customers/{customerId}/personas:
+    parameters:
+      - $ref: '#/components/parameters/customerId'
+    get:
+      operationId: listCustomerPersonas
+      description: |
+        Retrieve a customer's personas.\
+        You can use `_notexists` and `_includes` query parameters.\
+        The following entities can be used with `_notexists`
+        * `personaRoles`
+
+        The following entities can be used with `_includes`
+        * `personaRoles`
+          * `roles`
+      tags:
+        - Customer
+        - Persona
+      responses:
+        '200':
+          $ref: '#/components/responses/Personas'
+        '404':
+          $ref: '#/components/responses/Problem404'
+        
+  /api/v1/customers/{customerId}/partners:
+    parameters:
+      - $ref: '#/components/parameters/customerId'
+    get:
+      operationId: listCustomerPartners
+      description: |
+        Retrieve a Customer's Partners.\
+        You can use `_notexists` and `_includes` query parameters.\
+        The following entities can be used with `_notexists`
+        * `customers`
+        * `users` --> `lastModifiedBy`
+
+        The following entities can be used with `_includes`
+        * `users`
+        * `customers`
+      tags:
+        - Customer
+        - Partner
+      responses:
+        '200':
+          $ref: '#/components/responses/Partners'
+        '404':
+          $ref: '#/components/responses/Problem404'
+        
+    post:
+      operationId: createPartnerForCustomer
+      description: Create Partner for Customer
+      tags:
+        - Customer
+        - Partner
+      requestBody:
+        $ref: '#/components/requestBodies/PartnerCreate'
+      responses:
+        '201':
+          $ref: '#/components/responses/ObjectCreated'
+        
+  /api/v1/customers/{customerId}/partners/{partnerId}:
+    parameters:
+      - $ref: '#/components/parameters/customerId'
+      - $ref: '#/components/parameters/partnerId'
+    get:
+      operationId: getCustomerPartner
+      description: |
+        Retrieve a Customer's Partner.\
+        You can use `_notexists` and `_includes` query parameters.\
+        The following entities can be used with `_notexists`
+        * `customers`
+        * `users` --> `lastModifiedBy`
+
+        The following entities can be used with `_includes`
+        * `users`
+        * `customers`
+      tags:
+        - Customer
+        - Partner
+      responses:
+        '200':
+          $ref: '#/components/responses/Partner'
+        '404':
+          $ref: '#/components/responses/Problem404'
+        
+  /api/v1/customers/{customerId}/scoringLimits:
+    parameters:
+      - $ref: '#/components/parameters/customerId'
+    get:
+      operationId: listCustomerScoringLimits
+      description: |
+        Retrieve a Customer's Scoring limits.
+      tags:
+        - Customer
+      responses:
+        '200':
+          $ref: '#/components/responses/ScoringLimits'
+        '404':
+          $ref: '#/components/responses/Problem404'
+        
+    post:
+      operationId: createScoringLimitForCustomer
+      description: Create ScoringLimit for Customer
+      tags:
+        - Customer
+      requestBody:
+        $ref: '#/components/requestBodies/ScoringLimitCreate'
+      responses:
+        '201':
+          $ref: '#/components/responses/ObjectCreated'
+        
+  /api/v1/customers/{customerId}/scoringLimits/{scoringLimitId}:
+    parameters:
+      - $ref: '#/components/parameters/customerId'
+      - $ref: '#/components/parameters/scoringLimitId'
+    get:
+      operationId: getCustomerScoringLimit
+      description: |
+        Retrieve a Customer's Scoring limit.
+      tags:
+        - Customer
+      responses:
+        '200':
+          $ref: '#/components/responses/ScoringLimit'
+        '404':
+          $ref: '#/components/responses/Problem404'
+        
+  /api/v1/scoringLimits/{scoringLimitId}:
+    parameters:
+      - $ref: '#/components/parameters/scoringLimitId'
+    get:
+      operationId: getScoringLimit
+      description: Get Scoring Limit
+      tags:
+        - Customer
+      responses:
+        '200':
+          $ref: '#/components/responses/ScoringLimit'
+        
+    patch:
+      operationId: updateScoringLimit
+      description: Update Scoring Limit
+      tags:
+        - Customer
+      requestBody:
+        $ref: '#/components/requestBodies/ScoringLimitUpdate'
+      responses:
+        '204':
+          description: Score Limit updated
+        
+
+
+  /api/v1/declarations:
+    get:
+      operationId: listDeclarations
+      description: Retrieve declarations
+      tags:
+        - Persona
+      responses:
+        '200':
+          $ref: '#/components/responses/DeclarationsList'
+        
+  /api/v1/declarations/{declarationsId}:
+    parameters:
+      - $ref: '#/components/parameters/declarationsId'
+    get:
+      operationId: getDeclarations
+      description: Retrieve a Declarations
+      tags:
+        - Persona
+      responses:
+        '200':
+          $ref: '#/components/responses/Declarations'
+        '404':
+          $ref: '#/components/responses/Problem404'
+        
+    patch:
+      operationId: updateDeclarations
+      description: Update Declarations's top level properties.
+      tags:
+        - Persona
+      requestBody:
+        $ref: '#/components/requestBodies/DeclarationsStateUpdate'
+      responses:
+        '204':
+          description: Declarations updated
+        
+
+  /api/v1/devices:
+    get:
+      operationId: listDevices
+      description: |
+        Retrieve Devices.\
+        You can use `_notexists` and `_includes` query parameters.\
+        The following entities can be used with `_notexists`
+        * `users`
+
+        The following entities can be used with `_includes`
+        * `users`
+      tags:
+        - Device
+      responses:
+        '200':
+          $ref: '#/components/responses/Devices'
+        
+    post:
+      tags:
+        - Device
+      operationId: createDevice
+      description: Create Device without User
+      requestBody:
+        $ref: '#/components/requestBodies/DeviceCreate'
+      responses:
+        '201':
+          $ref: '#/components/responses/ObjectCreated'
+        
+
+
+  /api/v1/devices/{deviceId}:
+    parameters:
+      - $ref: '#/components/parameters/deviceId'
+    get:
+      operationId: getDevice
+      description: Retrieve a device.
+      tags:
+        - Device
+      responses:
+        '200':
+          $ref: '#/components/responses/Device'
+        '404':
+          $ref: '#/components/responses/Problem404'
+        
+    patch:
+      operationId: updateDevice
+      description: Update Device's top level properties.
+      tags:
+        - Device
+      requestBody:
+        $ref: '#/components/requestBodies/DeviceUpdate'
+      responses:
+        '204':
+          description: Device updated
+        
+    delete:
+      operationId: deleteDevice
+      description: Delete a device.
+      tags:
+        - Device
+      responses:
+        '204':
+          description: Device deleted
+        
+
+  /api/v1/invitations:
+    get:
+      operationId: listInvitations
+      description: |
+        Retrieve Invitations.\
+        You can use `_notexists` and `_includes` query parameters.\
+        The following entities can be used with `_notexists`
+        * `users`
+
+        The following entities can be used with `_includes`
+        * `customers`
+      tags:
+        - Invitation
+      responses:
+        '200':
+          $ref: '#/components/responses/Invitations'
+        
+  /api/v1/invitations/{invitationId}:
+    parameters:
+      - $ref: '#/components/parameters/invitationId'
+    get:
+      operationId: getInvitation
+      description: Retrieve a invitation.
+      tags:
+        - Invitation
+      responses:
+        '200':
+          $ref: '#/components/responses/Invitation'
+        '404':
+          $ref: '#/components/responses/Problem404'
+        
+    patch:
+      operationId: updateInvitation
+      description: Update Invitation registration IDs.
+      tags:
+        - Invitation
+      requestBody:
+        $ref: '#/components/requestBodies/InvitationUpdate'
+      responses:
+        '204':
+          description: Invitation updated
+        
+
+  /api/v1/partners:
+    get:
+      operationId: listPartners
+      description: |
+        Retrieve Partners\
+        You can use `_notexists` and `_includes` query parameters.\
+        The following entities can be used with `_notexists`
+        * `customers`
+        * `users`               
+
+        The following entities can be used with `_includes`
+        * `customers`
+        * `users` --> `lastModifiedBy`               
+
+      tags:
+        - Partner
+      responses:
+        '200':
+          $ref: '#/components/responses/Partners'
+        
+
+  /api/v1/partners/{partnerId}:
+    parameters:
+      - $ref: '#/components/parameters/partnerId'
+    get:
+      operationId: getPartner
+      description: |
+        Retrieve a Partner\
+        You can use `_notexists` and `_includes` query parameters.\
+        The following entities can be used with `_notexists`
+        * `customers`
+        * `users` --> `lastModifiedBy`
+
+        The following entities can be used with `_includes`
+        * `users`
+        * `customers`
+      tags:
+        - Partner
+      responses:
+        '200':
+          $ref: '#/components/responses/Partner'
+        '404':
+          $ref: '#/components/responses/Problem404'
+        
+    patch:
+      operationId: updatePartner
+      description: Update Partner's top level properties.
+      tags:
+        - Partner
+      requestBody:
+        $ref: '#/components/requestBodies/PartnerUpdate'
+      responses:
+        '204':
+          description: Partner updated
+        
+    delete:
+      operationId: deletePartner
+      description: Delete a Partner
+      tags:
+        - Partner
+      responses:
+        '204':
+          description: Partner deleted
+        
+
+  /api/v1/personas:
+    post:
+      operationId: createPersona
+      description: Create persona
+      tags:
+        - Persona
+      requestBody:
+        $ref: '#/components/requestBodies/PersonaCreate'
+      responses:
+        '201':
+          $ref: '#/components/responses/ObjectCreated'
+        
+    get:
+      operationId: listPersonas
+      description: |
+        Retrieve personas\
+        You can use `_notexists` and `_includes` query parameters.\
+        The following entities can be used with `_notexists`
+        * `customers`
+        * `users`               
+
+        The following entities can be used with `_includes`
+        * `customers`
+        * `users`               
+
+      tags:
+        - Persona
+      responses:
+        '200':
+          $ref: '#/components/responses/Personas'
+        
+  /api/v1/personas/{personaId}:
+    parameters:
+      - $ref: '#/components/parameters/personaId'
+    get:
+      operationId: getPersona
+      description: Retrieve a Persona
+      tags:
+        - Persona
+      responses:
+        '200':
+          $ref: '#/components/responses/Persona'
+        '404':
+          $ref: '#/components/responses/Problem404'
+        
+    patch:
+      operationId: updatePersona
+      description: Update Persona's top level properties.
+      tags:
+        - Persona
+      requestBody:
+        $ref: '#/components/requestBodies/PersonaUpdate'
+      responses:
+        '204':
+          description: Persona updated
+        
+
+  /api/v1/personas/{personaId}/personaRoles:
+    parameters:
+      - $ref: '#/components/parameters/personaId'
+    get:
+      operationId: listPersonaRolesByPersona
+      description: |
+        Retrieve PersonaRoles\
+        You can use `_notexists` and `_includes` query parameters.\
+        The following entities can be used with `_notexists`
+        * `roles`
+
+        The following entities can be used with `_includes`
+        * `roles`
+
+      tags:
+        - Persona
+      responses:
+        '200':
+          $ref: '#/components/responses/PersonaRoles'
+        
+    post:
+      operationId: addPersonaRoleToPersona
+      description: Add new persona role to persona
+      tags:
+        - Persona
+      requestBody:
+        $ref: '#/components/requestBodies/PersonaRoleCreate'
+      responses:
+        '201':
+          $ref: '#/components/responses/ObjectCreated'
+        
+
+  /api/v1/personas/{personaId}/declarations:
+    parameters:
+      - $ref: '#/components/parameters/personaId'
+    post:
+      operationId: addDeclarationsToPersona
+      description: Add new declarations to persona
+      tags:
+        - Persona
+      requestBody:
+        $ref: '#/components/requestBodies/DeclarationsStateCreate'
+      responses:
+        '201':
+          $ref: '#/components/responses/ObjectCreated'
+        
+
+
+  /api/v1/personaRoles:
+    get:
+      operationId: listPersonaRoles
+      description: |
+        Retrieve PersonaRoles\
+        You can use `_notexists` and `_includes` query parameters.\
+        The following entities can be used with `_notexists`
+        * `roles`
+
+        The following entities can be used with `_includes`
+        * `roles`
+
+      tags:
+        - Persona
+      responses:
+        '200':
+          $ref: '#/components/responses/PersonaRoles'
+        
+
+  /api/v1/personaRoles/{personaRoleId}:
+    parameters:
+      - $ref: '#/components/parameters/personaRoleId'
+    get:
+      operationId: getPersonaRole
+      description: Retrieve a PersonaRola
+      tags:
+        - Persona
+      responses:
+        '200':
+          $ref: '#/components/responses/PersonaRole'
+        '404':
+          $ref: '#/components/responses/Problem404'
+        
+    patch:
+      operationId: updatePersonaRole
+      description: |
+        Update PersonaRola's top level properties.\
+        Later `validTo` only set if previous value is null.
+      tags:
+        - Persona
+      requestBody:
+        $ref: '#/components/requestBodies/PersonaRoleUpdate'
+      responses:
+        '204':
+          description: PersonaRole updated
+        
+    delete:
+      operationId: deletePersonaRole
+      description: Delete a PersonaRole
+      tags:
+        - Persona
+      responses:
+        '204':
+          description: PersonaRole deleted
+        
+
+  /api/v1/roles:
+    post:
+      operationId: createRole
+      description: Create role
+      tags:
+        - Persona
+      requestBody:
+        $ref: '#/components/requestBodies/RoleCreate'
+      responses:
+        '201':
+          $ref: '#/components/responses/ObjectCreated'
+        
+    get:
+      operationId: listRoles
+      description: |
+        Retrieve roles\
+        You can't use the `_notexists` or `_includes` query parameters.
+
+      tags:
+        - Persona
+      responses:
+        '200':
+          $ref: '#/components/responses/Roles'
+        
+
+  /api/v1/roles/{roleId}:
+    parameters:
+      - $ref: '#/components/parameters/roleId'
+    get:
+      operationId: getRole
+      description: Retrieve a Role
+      tags:
+        - Persona
+      responses:
+        '200':
+          $ref: '#/components/responses/Role'
+        '404':
+          $ref: '#/components/responses/Problem404'
+        
+    patch:
+      operationId: updateRole
+      description: Update Role's top level properties.
+      tags:
+        - Persona
+      requestBody:
+        $ref: '#/components/requestBodies/RoleUpdate'
+      responses:
+        '204':
+          description: Role updated
+        
+
+
+
+
+
+
+  /api/v1/pep:
+    post:
+      operationId: createPep
+      description: Create pep
+      tags:
+        - Persona
+      requestBody:
+        $ref: '#/components/requestBodies/PepCreate'
+      responses:
+        '201':
+          $ref: '#/components/responses/ObjectCreated'
+        
+
+  /api/v1/pep/{pepId}:
+    parameters:
+      - $ref: '#/components/parameters/pepId'
+    get:
+      operationId: getPep
+      description: Retrieve a Pep
+      tags:
+        - Persona
+      responses:
+        '200':
+          $ref: '#/components/responses/Pep'
+        '404':
+          $ref: '#/components/responses/Problem404'
+        
+    patch:
+      operationId: updatePep
+      description: Update Pep's top level properties.
+      tags:
+        - Persona
+      requestBody:
+        $ref: '#/components/requestBodies/PepUpdate'
+      responses:
+        '204':
+          description: Pep updated
+        
+
+
+  /api/v1/subscriptionPackages:
+    post:
+      operationId: createSubscriptionPackage
+      description: Create subscription package
+      tags:
+        - Account
+      requestBody:
+        $ref: '#/components/requestBodies/SubscriptionPackageCreate'
+      responses:
+        '201':
+          $ref: '#/components/responses/ObjectCreated'
+        
+    get:
+      operationId: listSubscriptionPackages
+      description: |
+        Retrieve Subscription packages\
+        You can use `_notexists` and `_includes` query parameters.\
+        The following entities can be used with `_notexists`
+        * `monthlyFee`
+        * `transactionalAmountFeeMaximum`
+        * `transactionalAmountFeeFix`
+        * `transactionalAmountFeeMinimum`
+        
+        The following entities can be used with `_includes`
+        * `monthlyFee`
+        * `transactionalAmountFeeMaximum`
+        * `transactionalAmountFeeFix`
+        * `transactionalAmountFeeMinimum`
+
+      tags:
+        - Account
+      responses:
+        '200':
+          $ref: '#/components/responses/SubscriptionPackages'
+
+  /api/v1/subscriptionPackages/{subscriptionPackageId}:
+    parameters:
+      - $ref: '#/components/parameters/subscriptionPackageId'
+    get:
+      operationId: getSubscriptionPackage
+      description: Retrieve a subscription package
+      tags:
+        - Account
+      responses:
+        '200':
+          $ref: '#/components/responses/SubscriptionPackage'
+        '404':
+          $ref: '#/components/responses/Problem404'
+        
+    patch:
+      operationId: updateSubscriptionPackage
+      description: Update SubscriptionPackage's top level properties.
+      tags:
+        - Account
+      requestBody:
+        $ref: '#/components/requestBodies/SubscriptionPackageUpdate'
+      responses:
+        '204':
+          description: SubscriptionPackage updated
+        
+
+  /api/v1/users:
+    get:
+      tags:
+        - User
+      operationId: listUsers
+      description: |
+        List users \
+        Usable for:
+          - query all users with pagination and soring
+          - query User with different filtering
+          - query User with 4T:
+            - firstName
+            - lastName
+            - mothersMaidenName
+            - placeOfBirth
+            - dateOfBirth
+        
+        You can use `_notexists` and `_includes` query parameters.\
+        The following entities can be used with `_notexists`
+        * `identityDocuments`
+        * `personas`
+        * `devices`
+        
+        The following entities can be used with `_includes`
+        * `identityDocuments`
+        * `personas`
+          * `users`
+          * `customers`
+        * `devices`
+          * `users`
+
+      parameters:
+        - name: firstName
+          in: query
+          description: The user's first name.
+          schema:
+            type: string
+          example: John
+        - name: lastName
+          in: query
+          description: The user's last name.
+          schema:
+            type: string
+          example: Doe
+        - name: mothersMaidenName
+          in: query
+          description: The user's mother's maiden name.
+          schema:
+            type: string
+          example: Anna Doe
+        - name: placeOfBirth
+          in: query
+          description: The user's place of birth.
+          schema:
+            type: string
+          example: Budapest
+        - name: dateOfBirth
+          in: query
+          description: "The user's date of birth (in ISO 8601 format: 'YYYY-MM-DD')."
+          schema:
+            type: string
+            format: date
+          example: '1980-01-01'
+      responses:
+        '200':
+          $ref: '#/components/responses/Users'
+        
+
+    post:
+      tags:
+        - User
+      operationId: createUser
+      description: Create user
+      requestBody:
+        $ref: '#/components/requestBodies/UserCreate'
+      responses:
+        '201':
+          $ref: '#/components/responses/ObjectCreated'
+        
+  /api/v1/users/{userId}:
+    parameters:
+      - $ref: '#/components/parameters/userId'
+    get:
+      tags:
+        - User
+      operationId: getUser
+      description: Retrieve a user
+      responses:
+        '200':
+          $ref: '#/components/responses/User'
+        '404':
+          $ref: '#/components/responses/Problem404'
+        
+    patch:
+      tags:
+        - User
+      operationId: updateUser
+      description: Update user
+      requestBody:
+        $ref: '#/components/requestBodies/UserUpdate'
+      responses:
+        '204':
+          description: User updated
+        
+    delete:
+      tags:
+        - User
+      operationId: deleteUser
+      description: Delete user
+      responses:
+        '204':
+          description: User deleted
+
+  /api/v1/users/{userId}/cards:
+    parameters:
+      - $ref: '#/components/parameters/userId'
+    get:
+      tags:
+        - Card
+        - User
+      operationId: listUserCards
+      description: |
+        Get user assigned cards\
+        The following entities can be used with `_includes`
+        * `accounts`        
+        * `cardLimits`
+        * `customers`
+        * `users`
+      responses:
+        '200':
+          $ref: '#/components/responses/Cards'
+  /api/v1/users/{userId}/cards/{cardId}:
+    parameters:
+      - $ref: '#/components/parameters/cardId'
+      - $ref: '#/components/parameters/userId'
+    get:
+      tags:
+        - Card
+        - User
+      operationId: getUserCardById
+      description: |
+        Get user assigned card\
+        The following entities can be used with `_includes`
+        * `accounts`        
+        * `cardLimits`
+        * `customers`
+        * `users`
+      responses:
+        '200':
+          $ref: '#/components/responses/Cards'
+
+
+  /api/v1/users/{userId}/devices:
+    parameters:
+      - $ref: '#/components/parameters/userId'
+    get:
+      tags:
+        - Device
+        - User
+      operationId: listUserAssignedDevices
+      description: |
+        Get user assigned devices\
+        You can use `_notexists` and `_includes` query parameters.\
+        The following entities can be used with `_notexists`
+        * `users`
+
+        The following entities can be used with `_includes`
+        * `users`
+
+      responses:
+        '200':
+          $ref: '#/components/responses/Devices'
+    post:
+      tags:
+        - Device
+        - User
+      operationId: assignDeviceForUser
+      description: Assign device for user
+      requestBody:
+        $ref: '#/components/requestBodies/DeviceCreate'
+      responses:
+        '201':
+          $ref: '#/components/responses/ObjectCreated'
+        
+
+  /api/v1/users/{userId}/devices/{deviceId}:
+    parameters:
+      - $ref: '#/components/parameters/userId'
+      - $ref: '#/components/parameters/deviceId'
+    get:
+      tags:
+        - Device
+        - User
+      operationId: getUserAssignedDevice
+      description: Get assigned device
+      responses:
+        '200':
+          $ref: '#/components/responses/Device'
+        
+    post:
+      tags:
+        - Device
+        - User
+      operationId: assignExistingDeviceForUser
+      description: Assign existing device for user
+      responses:
+        '204':
+          description: Device assigned
+        
+
+    delete:
+      deprecated: true
+      tags:
+        - Device
+        - User
+      operationId: deleteDeviceAssignmentFromUser
+      description: Delete device assignment from user
+      responses:
+        '204':
+          description: Device assignment deleted
+
+  /api/v1/users/{userId}/invitations:
+    parameters:
+      - $ref: '#/components/parameters/userId'
+    get:
+      operationId: listUserInvitations
+      description: |
+        Retrieve Invitations.\
+        You can use `_notexists` and `_includes` query parameters.\
+        The following entities can be used with `_notexists`
+        * `users`
+
+        The following entities can be used with `_includes`
+        * `customers`
+      tags:
+        - Invitation
+        - User
+      responses:
+        '200':
+          $ref: '#/components/responses/Invitations'
+        
+    post:
+      operationId: createInvitationByUser
+      description: Create invitation
+      tags:
+        - Invitation
+        - User
+      requestBody:
+        $ref: '#/components/requestBodies/InvitationCreate'
+      responses:
+        '201':
+          $ref: '#/components/responses/ObjectCreated'
+        
+
+  /api/v1/users/{userId}/invitations/{invitationId}:
+    parameters:
+      - $ref: '#/components/parameters/invitationId'
+      - $ref: '#/components/parameters/userId'
+    get:
+      operationId: getUserInvitation
+      description: |
+        Retrieve Invitation.\
+        The following entities can be used with `_includes`
+        * `customers`
+      tags:
+        - Invitation
+        - User
+      responses:
+        '200':
+          $ref: '#/components/responses/Invitation'
+        
+
+  /api/v1/users/{userId}/personas:
+    parameters:
+      - $ref: '#/components/parameters/userId'
+    get:
+      operationId: listUserPersonas
+      description: |
+        Retrieve a user's personas\
+        You can use `_notexists` and `_includes` query parameters.\
+        The following entities can be used with `_notexists`
+        * `customers`
+        * `users`
+
+        The following entities can be used with `_includes`
+        * `customers`
+        * `users`
+
+      tags:
+        - Persona
+        - User
+      responses:
+        '200':
+          $ref: '#/components/responses/Personas'
+        '404':
+          $ref: '#/components/responses/Problem404'
+        
+  /api/v1/users/{userId}/personas/{personaId}:
+    parameters:
+      - $ref: '#/components/parameters/userId'
+      - $ref: '#/components/parameters/personaId'
+    get:
+      tags:
+        - Persona
+        - User
+      operationId: getUserPersona
+      description: Retrieve a user's personas
+      responses:
+        '200':
+          $ref: '#/components/responses/Persona'
+    delete:
+      deprecated: true
+      operationId: deleteUserPersona
+      description: Delete user's persona
+      tags:
+        - Persona
+        - User
+      responses:
+        '200':
+          description: The queried user's personas.
+
+  /api/v1/users/1/pep:
+    parameters:
+      - $ref: '#/components/parameters/pepId'
+    post:
+      tags:
+        - User
+      operationId: assignPepForUser
+      description: Assign pep for user
+      requestBody:
+        $ref: '#/components/requestBodies/PepCreate'
+      responses:
+        '201':
+          $ref: '#/components/responses/ObjectCreated'
+        
+
+  /api/v1/users/{userId}/pep/{pepId}:
+    parameters:
+      - $ref: '#/components/parameters/userId'
+      - $ref: '#/components/parameters/pepId'
+    get:
+      tags:
+        - User
+      operationId: getUserAssignedPep
+      description: Get assigned pep
+      responses:
+        '200':
+          $ref: '#/components/responses/Pep'
+        
+    post:
+      tags:
+        - User
+      operationId: assignExistingPepForUser
+      description: Assign existing pep for user
+      responses:
+        '204':
+          description: Pep assigned
+        
+
+
+
+  /webhook/forgerock/v1/loginSuccess:
+    post:
+      operationId: updateLoginSuccess
+      description: Update device with last (current) success login.
+      tags:
+        - Device
+      requestBody:
+        $ref: '#/components/requestBodies/LoginSuccess'
+      responses:
+        '201':
+          $ref: '#/components/responses/ObjectCreated'
+        
+
+
+components:
+  schemas:
+    # ----------
+    # ENUMS
+    # ----------
+    enum_typeOfCard:
+      type: string
+      description: |
+        Type of card. \
+        * 'PLASTIC' - Plastic card \
+        * 'VIRTUAL' - Virtual card
+      enum:
+        - PLASTIC
+        - VIRTUAL
+      example: "PLASTIC"
+    enum_cardPaymentNetwork:
+      type: string
+      description: |
+        Type of card. \
+        * `MASTERCARD` - Mastercard \
+        * `VISA` - VISA
+      enum:
+        - MASTERCARD
+        - VISA
+      example: "MASTERCARD"
+    enum_cardStatus:
+      type: string
+      description: |
+        Status of the card. \
+        * `ACTIVE` - Active \
+        * `INACTIVE` - Inactive \
+        * `LOST` - Lost \
+        * `STOLEN` - Stolen \
+        * `DESTROYED` - Destroyed \
+        * `DO_NOT_HONOR` - Do not honor \
+        * `RESTRICTED_CARD` - Restricted card
+      enum:
+        - ACTIVE
+        - INACTIVE
+        - LOST
+        - STOLEN
+        - DESTROYED
+        - DO_NOT_HONOR
+        - RESTRICTED_CARD
+      example: "ACTIVE"
+    enum_cardLimitType:
+      type: string
+      description: |
+        Type of the limit. \
+        * `ATM_WITHDRAWAL_DAILY` - ATM withdrawal daily \
+        * `POS_PURCHASES_DAILY` - POS purchases daily \
+        * `ONLINE_PURCHASES_DAILY` - Online purchases daily
+      enum:
+        - ATM_WITHDRAWAL_DAILY
+        - POS_PURCHASES_DAILY
+        - ONLINE_PURCHASES_DAILY
+      example: "ATM_WITHDRAWAL_DAILY"
+    enum_scoringLimitType:
+      type: string
+      description: |
+        Type of the limit.\
+        * `INCOMING_TRANSFER` - Incoming transfer \
+        * `OUTGOING_TRANSFER` - Outgoing transfer \
+        * `ATM_WITHDRAWAL` - ATM withdrawal
+      enum:
+        - INCOMING_TRANSFER
+        - OUTGOING_TRANSFER
+        - ATM_WITHDRAWAL
+      example: "INCOMING_TRANSFER"
+    enum_scoringResultType:
+      type: string
+      description: |
+        Type of the scoring result.\
+        * `LOW` - Low \
+        * `MEDIUM` - Medium \
+        * `HIGH-1` - High 1 \
+        * `HIGH-2` - High 2 \
+        * `HIGH-3` - High 3
+      enum:
+        - LOW
+        - MEDIUM
+        - HIGH-1
+        - HIGH-2
+        - HIGH-3
+      example: "LOW"
+    enum_customerStatus:
+      type: string
+      description: |-
+        * `ACTIVE` - Active
+        * `UNDER_CANCELLATION` - Under cancellation
+        * `INACTIVE` - Inactive
+        * `CEASED` - Ceased
+        * `SUSPENDED` - Suspended
+      enum:
+        - ACTIVE
+        - UNDER_CANCELLATION
+        - INACTIVE
+        - CEASED
+        - SUSPENDED
+      example: "ACTIVE"
+    enum_taxNumberStatus:
+      type: string
+      description: |-
+        * `ACTIVE` - active
+        * `SUSPENDED` - suspended
+        * `DELETED` - deleted
+      enum:
+        - ACTIVE
+        - SUSPENDED
+        - DELETED
+      example: "ACTIVE"
+    enum_deviceStatus:
+      type: string
+      description: |-
+        * `REGISTRATION_IN_PROGRESS` - Device owner did not finish the registration process yet.
+        * `ACTIVE` - Activated device.
+        * `SUSPENDED` - Suspended device.
+        * `DELETED` - Deleted device.
+      enum:
+        - REGISTRATION_IN_PROGRESS
+        - ACTIVE
+        - SUSPENDED
+        - DELETED
+      example: "ACTIVE"
+    enum_identityDocumentType:
+      type: string
+      title: Identity document type
+      description: |-
+        * `EID` - eID (eSzemélyi)
+        * `PASSPORT` - ePassport
+        * `ADDRESS_CARD` - Address card (lakcímkártya)
+        * `LEGACY_ID` - Legacy ID (régi személyi)
+      enum:
+        - EID
+        - PASSPORT
+        - ADDRESS_CARD
+        - LEGACY_ID
+      example: EID
+    enum_partnerIdentifierType:
+      type: string
+      description: |-
+        * IBANAccount: IBAN account number
+        * BinXeMoneyAccount: BinX eMoney account number
+        * phoneNumber: Phone number
+        * emailAddress: Email address
+        * taxIdNumber: Tax ID number
+        * taxNumber: Tax number
+      enum:
+        - IBANAccount
+        - BinXeMoneyAccount
+        - phoneNumber
+        - emailAddress
+        - taxIdNumber
+        - taxNumber
+      example: IBANAccount
+    enum_representativeMode:
+      type: string
+      description: |-
+        * `SOLE` - sole
+        * `JOINT` - joint
+      enum:
+        - SOLE
+        - JOINT
+      example: SOLE
+    enum_userStatus:
+      type: string
+      description: |-
+        * `ACTIVE` - The user is active.
+        * `INACTIVE` - The user is currently inactive.
+        * `SUSPENDED` - The user is suspended.
+        * `DECEASED` - The user is deceased.
+        * `CONSERVATEE` - The user is under conservatorship.
+      enum:
+        - ACTIVE
+        - INACTIVE
+        - SUSPENDED
+        - DECEASED
+        - CONSERVATEE
+      example: ACTIVE
+    enum_kycMethod:
+      type: string
+      description: |-
+        * `AUTOMATIC` - Fully automatic KYC process.
+        * `MANUAL` - The user when through the KYC process with a live video check.
+      enum:
+        - AUTOMATIC
+        - MANUAL
+      example: AUTOMATIC
+    enum_relationship:
+      type: string
+      description: |-
+        * `NONE` - No relationship.
+        * `CO_OWNER` - Co-owner.
+        * `BENEFACTOR` - Benefactor.
+      enum:
+        - NONE
+        - CO_OWNER
+        - BENEFACTOR
+      example: NONE
+    enum_relative:
+      type: string
+      description: |-
+        * `NONE` - No relationship.
+        * `SPOUSE` - Spouse.
+        * `PARTNER` - Partner.
+        * `CHILD` - Child.
+        * `CHILD_IN_LAW` - Child in law.
+        * `PARENT` - Parent.
+      enum:
+        - NONE
+        - SPOUSE
+        - PARTNER
+        - CHILD
+        - CHILD_IN_LAW
+        - PARENT
+      example: NONE
+    enum_pep_type:
+      type: string
+      description: |-
+        * `NONE` - No PEP.
+        * `STATE_HEAD` - State head.
+        * `PARLIAMENT_MEMBER` - Parliament member.
+        * `PARTY_LEADERSHIP` - Party leadership.
+        * `SENIOR_JUDGE` - Senior judge.
+        * `SENIOR_FINANCIAL` - Senior financial.
+        * `SENIOR_ARMEDFORCES` - Senior armed forces.
+        * `STATE_COMPANY_LEADERSHIP` - State company leadership.
+        * `INTERNATIONAL_ORGANIZATION` - International organization.
+      enum:
+        - NONE
+        - STATE_HEAD
+        - PARLIAMENT_MEMBER
+        - PARTY_LEADERSHIP
+        - SENIOR_JUDGE
+        - SENIOR_FINANCIAL
+        - SENIOR_ARMEDFORCES
+        - STATE_COMPANY_LEADERSHIP
+        - INTERNATIONAL_ORGANIZATION
+      example: NONE
+    enum_statement_frequency:
+      type: string
+      description: |-
+        * `DAILY` - Daily statement.
+        * `MONTHLY` - Monthly statement.
+      enum:
+        - DAILY
+        - MONTHLY
+      example: DAILY
+    enum_paper_side:
+      type: string
+      description: |-
+        * `FRONT` - Front side.
+        * `BACK` - Back side.
+      enum:
+        - FRONT
+        - BACK
+      example: FRONT
+    enum_account_type:
+      type: string
+      description: |
+        Type of the account.\
+        * `SAVINGS` - Savings account.\
+        * `CREDIT` - Credit account.\
+        * `LOAN` - Loan account.\
+        * `DEPOSIT` - Deposit account.\
+        If not specified, then the default meaning is `SAVINGS`.
+      enum:
+        - SAVINGS
+        - CREDIT
+        - LOAN
+        - DEPOSIT
+      example: SAVINGS
+    # -----
+
+
+    AbstractEntity:
+      description: |
+        An abstract entity.\
+        All returned entities (e.g. User, Customer, etc.) inherit from this.
+      type: object
+      required:
+        - uuid
+        - _created
+        - _updated
+      additionalProperties: false
+      properties:
+        uuid:
+          $ref: '#/components/schemas/UUIDReference'
+        _createdAt:
+          type: string
+          format: date-time
+          readOnly: true
+          description: Creation timestamp of the entity.
+          example: "2023-08-14T18:07:59.502555Z"
+        _createdBy:
+          type: string
+          format: uuid
+          readOnly: true
+          description: ID of the user who created the entity.
+          example: "00000000-0000-0000-0000-000000000000"
+        _updatedAt:
+          type: string
+          format: date-time
+          readOnly: true
+          description: Update timestamp of the entity.
+          example: "2023-08-14T18:07:59.502555Z"
+        _updatedBy:
+          type: string
+          format: uuid
+          readOnly: true
+          description: ID of the user who updated the entity.
+          example: "00000000-0000-0000-0000-000000000000"
+
+    Account:
+      type: object
+      description: An object that represents an account.
+      required:
+        - uuid
+        - currency
+        - subscriptionPackageId
+        - _createdAt
+        - _createdBy
+        - _updatedAt
+        - _updatedBy
+      properties:
+        uuid:
+          $ref: '#/components/schemas/UUID'
+        iban:
+          $ref: '#/components/schemas/IBAN'
+        currency:
+          $ref: '#/components/schemas/Currency'
+        subscriptionPackageId:
+          $ref: '#/components/schemas/UUIDReference'
+        diPocketAccountId:
+          type: string
+          description: Account ID in DiPocket
+          example: "123456789"
+        statementFrequency:
+          $ref: '#/components/schemas/enum_statement_frequency'
+        externalId:
+          $ref: '#/components/schemas/UUID'
+        accountType:
+          $ref: '#/components/schemas/enum_account_type'
+        _createdAt:
+          type: string
+          format: date-time
+          readOnly: true
+          description: Creation timestamp of the entity.
+          example: "2023-08-14T18:07:59.502555Z"
+        _createdBy:
+          type: string
+          format: uuid
+          readOnly: true
+          description: ID of the user who created the entity.
+          example: "00000000-0000-0000-0000-000000000000"
+        _updatedAt:
+          type: string
+          format: date-time
+          readOnly: true
+          description: Update timestamp of the entity.
+          example: "2023-08-14T18:07:59.502555Z"
+        _updatedBy:
+          type: string
+          format: uuid
+          readOnly: true
+          description: ID of the user who updated the entity.
+          example: "00000000-0000-0000-0000-000000000000"
+
+    AccountCreate:
+      type: object
+      description: An object that represents an account.
+      required:
+        - currency
+        - subscriptionPackageId
+      properties:
+        uuid:
+          $ref: '#/components/schemas/UUIDReference'
+        iban:
+          $ref: '#/components/schemas/IBAN'
+        currency:
+          $ref: '#/components/schemas/Currency'
+        subscriptionPackageId:
+          $ref: '#/components/schemas/UUIDReference'
+        diPocketAccountId:
+          type: string
+          description: Account ID in DiPocket
+          example: "123456789"
+        statementFrequency:
+          $ref: '#/components/schemas/enum_statement_frequency'
+        externalId:
+          $ref: '#/components/schemas/UUID'
+        accountType:
+          $ref: '#/components/schemas/enum_account_type'
+    AccountUpdate:
+      type: object
+      description: Update Account
+      properties:
+        subscriptionPackageId:
+          $ref: '#/components/schemas/UUIDReference'
+        diPocketAccountId:
+          type: string
+          description: Account ID in DiPocket
+          example: "123456789"
+        statementFrequency:
+          $ref: '#/components/schemas/enum_statement_frequency'
+    Accounts:
+      type: array
+      items:
+        $ref: '#/components/schemas/Account'
+
+    ActivityClassification:
+      type: object
+      required:
+        - uuid
+        - code
+        - description
+        - primary
+        - _createdAt
+        - _createdBy
+        - _updatedAt
+        - _updatedBy
+      additionalProperties: false
+      properties:
+        uuid:
+          $ref: '#/components/schemas/UUID'
+        code:
+          description: TEAOR_08 code of the activity
+          type: string
+          # pattern: '^\d{2}(\.\d{2}){0,3}$'
+          example: "01.11"
+        description:
+          type: string
+          description: Activity description
+          example: "Growing of cereals (except rice), leguminous crops and oil seeds"
+        primary:
+          type: boolean
+          description: Primary activity of the company
+          example: true
+        _createdAt:
+          type: string
+          format: date-time
+          readOnly: true
+          description: Creation timestamp of the entity.
+          example: "2023-08-14T18:07:59.502555Z"
+        _createdBy:
+          type: string
+          format: uuid
+          readOnly: true
+          description: ID of the user who created the entity.
+          example: "00000000-0000-0000-0000-000000000000"
+        _updatedAt:
+          type: string
+          format: date-time
+          readOnly: true
+          description: Update timestamp of the entity.
+          example: "2023-08-14T18:07:59.502555Z"
+        _updatedBy:
+          type: string
+          format: uuid
+          readOnly: true
+          description: ID of the user who updated the entity.
+          example: "00000000-0000-0000-0000-000000000000"
+    ActivityClassificationCreate:
+      type: object
+      required:
+        - code
+        - description
+        - primary
+      additionalProperties: false
+      properties:
+        uuid:
+          $ref: '#/components/schemas/UUIDReference'
+        code:
+          description: TEAOR_08 code of the activity
+          type: string
+          # pattern: '^\d{2}(\.\d{2}){0,3}$'
+          example: "01.11"
+        description:
+          type: string
+          description: Activity description
+          example: "Growing of cereals (except rice), leguminous crops and oil seeds"
+        primary:
+          type: boolean
+          description: Primary activity of the company
+          example: true
+
+    Currency:
+      type: string
+      description: Currency ([ISO 4217 code](https://en.wikipedia.org/wiki/ISO_4217)) of the money amount.
+      pattern: ^[A-Z]{3}$
+      example: HUF
+
+    Card:
+      type: object
+      description: An object that represents a card.
+      required:
+        - uuid
+        - accountId
+        - customerId
+        - userId
+        - cardHolderName
+        - cardCompanyName
+        - typeOfCard
+        - paymentNetwork
+        - cardStatus
+        - token
+        - maskedPan
+        - _createdAt
+        - _createdBy
+        - _updatedAt
+        - _updatedBy
+      additionalProperties: false
+      properties:
+        uuid:
+          $ref: '#/components/schemas/UUID'
+        accountId:
+          $ref: '#/components/schemas/UUIDReference'
+        customerId:
+          $ref: '#/components/schemas/UUIDReference'
+        userId:
+          $ref: '#/components/schemas/UUIDReference'
+        cardHolderName:
+          type: string
+          description: Name of the card.
+          example: "John Doe"
+        cardCompanyName:
+          type: string
+          description: Company name of the card.
+          example: "John Doe Ltd."
+        typeOfCard:
+          $ref: '#/components/schemas/enum_typeOfCard'
+        paymentNetwork:
+          $ref: '#/components/schemas/enum_cardPaymentNetwork'
+        cardStatus:
+          $ref: '#/components/schemas/enum_cardStatus'
+        token:
+          type: string
+          description: Token of the card.
+          example: "1234567890123456"
+        maskedPan:
+          description: Masked PAN of the card.
+          type: string
+          pattern: '^\d{6}\*{6}\d{4}$'
+          example: "123456******1234"
+        cardLimits:
+          $ref: '#/components/schemas/CardLimits'
+        _createdAt:
+          type: string
+          format: date-time
+          readOnly: true
+          description: Creation timestamp of the entity.
+          example: "2023-08-14T18:07:59.502555Z"
+        _createdBy:
+          type: string
+          format: uuid
+          readOnly: true
+          description: ID of the user who created the entity.
+          example: "00000000-0000-0000-0000-000000000000"
+        _updatedAt:
+          type: string
+          format: date-time
+          readOnly: true
+          description: Update timestamp of the entity.
+          example: "2023-08-14T18:07:59.502555Z"
+        _updatedBy:
+          type: string
+          format: uuid
+          readOnly: true
+          description: ID of the user who updated the entity.
+          example: "00000000-0000-0000-0000-000000000000"
+
+    CardCreate:
+      type: object
+      description: Create a card.
+      required:
+        - accountId
+        - customerId
+        - userId
+        - cardHolderName
+        - cardCompanyName
+        - typeOfCard
+        - paymentNetwork
+        - cardStatus
+        - token
+        - maskedPan
+      additionalProperties: false
+      properties:
+        uuid:
+          $ref: '#/components/schemas/UUIDReference'
+        accountId:
+          $ref: '#/components/schemas/UUIDReference'
+        customerId:
+          $ref: '#/components/schemas/UUIDReference'
+        userId:
+          $ref: '#/components/schemas/UUIDReference'
+        cardHolderName:
+          type: string
+          description: Name of the card.
+          example: "John Doe"
+        cardCompanyName:
+          type: string
+          description: Company name of the card.
+          example: "John Doe Ltd."
+        typeOfCard:
+          $ref: '#/components/schemas/enum_typeOfCard'
+        paymentNetwork:
+          $ref: '#/components/schemas/enum_cardPaymentNetwork'
+        cardStatus:
+          $ref: '#/components/schemas/enum_cardStatus'
+        token:
+          type: string
+          description: Token of the card.
+          example: "1234567890123456"
+        maskedPan:
+          description: Masked PAN of the card.
+          type: string
+          pattern: '^\d{6}\*{6}\d{4}$'
+          example: "123456******1234"
+        cardLimits:
+          $ref: '#/components/schemas/CardLimitsCreate'
+    CardUpdate:
+      type: object
+      description: Update a Card's top level properties.
+      additionalProperties: false
+      properties:
+        cardStatus:
+          $ref: '#/components/schemas/enum_cardStatus'
+    Cards:
+      type: array
+      items:
+        $ref: '#/components/schemas/Card'
+    CardLimit:
+      type: object
+      description: Create a card limit.
+      additionalProperties: false
+      required:
+        - uuid
+        - limitType
+        - count
+        - amount
+        - currency
+        - _createdAt
+        - _createdBy
+        - _updatedAt
+        - _updatedBy
+      properties:
+        uuid:
+          $ref: '#/components/schemas/UUIDReference'
+        limitType:
+          $ref: '#/components/schemas/enum_cardLimitType'
+        count:
+          description: Count of the limit.
+          type: integer
+          minimum: 0
+          example: 10
+        amount:
+          description: Amount of money.
+          type: number
+          minimum: 0
+          example: 123456789.12
+        currency:
+          $ref: '#/components/schemas/Currency'
+        _createdAt:
+          type: string
+          format: date-time
+          readOnly: true
+          description: Creation timestamp of the entity.
+          example: "2023-08-14T18:07:59.502555Z"
+        _createdBy:
+          type: string
+          format: uuid
+          readOnly: true
+          description: ID of the user who created the entity.
+          example: "00000000-0000-0000-0000-000000000000"
+        _updatedAt:
+          type: string
+          format: date-time
+          readOnly: true
+          description: Update timestamp of the entity.
+          example: "2023-08-14T18:07:59.502555Z"
+        _updatedBy:
+          type: string
+          format: uuid
+          readOnly: true
+          description: ID of the user who updated the entity.
+          example: "00000000-0000-0000-0000-000000000000"
+
+    CardLimits:
+      type: array
+      items:
+        $ref: '#/components/schemas/CardLimit'
+    CardLimitCreate:
+      type: object
+      description: Create a card limit.
+      additionalProperties: false
+      required:
+        - limitType
+        - count
+        - amount
+        - currency
+      properties:
+        limitType:
+          $ref: '#/components/schemas/enum_cardLimitType'
+        count:
+          description: Count of the limit.
+          type: integer
+          minimum: 0
+          example: 10
+        amount:
+          description: Amount of money.
+          type: number
+          minimum: 0
+          example: 123456789.12
+        currency:
+          $ref: '#/components/schemas/Currency'
+    CardLimitUpdate:
+      type: object
+      description: Update a card limit.
+      additionalProperties: false
+      properties:
+        count:
+          description: Count of the limit.
+          type: integer
+          minimum: 0
+          example: 10
+        amount:
+          description: Amount of money.
+          type: number
+          minimum: 0
+          example: 123456789.12
+        currency:
+          $ref: '#/components/schemas/Currency'
+    CardLimitsCreate:
+      type: array
+      items:
+        $ref: '#/components/schemas/CardLimitCreate'
+
+    Customer:
+      type: object
+      description: An object that represents a customer.
+      required:
+        - uuid
+        - status
+        - registrationNumber
+        - companyType
+        - name
+        - shortName
+        - seat
+        # - activityClassifications
+        # - representatives
+        - statisticalNumber
+        - taxNumber
+        - accountOpeningReason
+        - _createdAt
+        - _createdBy
+        - _updatedAt
+        - _updatedBy
+      additionalProperties: false
+      properties:
+        uuid:
+          $ref: '#/components/schemas/UUID'
+        status:
+          $ref: '#/components/schemas/enum_customerStatus'
+        registrationNumber:
+          type: string
+          description: Registration number of the customer (company reg. or sole prop. reg number).
+          example: "12345678"
+        companyType:
+          type: string
+          description: Company type of the customer.
+          example: "Sole Proprietorship"
+        name:
+          type: string
+          description: Company name of the customer.
+          example: "John Doe Korlátolt Felelősségű Társaság"
+        shortName:
+          type: string
+          description: Short company name of the customer.
+          example: "John Doe Kft."
+        seat:
+          type: string
+          description: Registered seat address of the customer.
+          example: "1234 Budapest, John Doe utca 1."
+        activityClassifications:
+          type: array
+          description: List of activity classifications of the customer.
+          items:
+            $ref: '#/components/schemas/ActivityClassification'
+        representatives:
+          type: array
+          description: List of representatives for the customer company.
+          items:
+            $ref: '#/components/schemas/Representative'
+        statisticalNumber:
+          type: string
+          description: Statistical number of the customer.
+          # https://www.ksh.hu/statisztikai-szamjel
+          # pattern: '^\d{8} \d{4} \d{3} \d{2}$'
+          example: "12345678 6202 117 01"
+        taxNumber:
+          type: string
+          description: Tax number of the customer.
+          # pattern: '^\d{8}-\d-\d{2}$'
+          example: "12345678-1-12"
+        taxNumberStatus:
+          $ref: '#/components/schemas/enum_taxNumberStatus'
+        accountOpeningReason:
+          type: string
+          description: Reason of account opening, provided during registration
+          example: "Account opening reason"
+        diPocketCorpClientId:
+          type: string
+          description: Corporation Client ID in DiPocket
+          example: "1234567890"
+        personas:
+          readOnly: true
+          description: List of personas objects or uuids associated with the customer.
+          oneOf:
+            - $ref: '#/components/schemas/ListOfUUIDs'
+            - $ref: '#/components/schemas/Personas'
+        accounts:
+          readOnly: true
+          description: List of accounts objects or uuids associated with the customer.
+          oneOf:
+            - $ref: '#/components/schemas/ListOfUUIDs'
+            - $ref: '#/components/schemas/Accounts'
+        scoringResult:
+          $ref: '#/components/schemas/enum_scoringResultType'
+        scoringLimits:
+          $ref: '#/components/schemas/ScoringLimits'
+        requestCreditCard:
+          type: boolean
+          description: Request credit card.
+          example: true
+        requestVirtualCreditCard:
+          type: boolean
+          description: Request virtual credit card.
+          example: true
+        shortId:
+          type: string
+          description: Short ID of the Customer.
+          minLength: 8
+          maxLength: 8
+          example: "12345678"
+        email:
+          type: string
+          description: email address
+          example: "email@domain.hu"
+        reinforcedProcessFlag:
+          type: string
+          format: date
+          description: Reinforced process flag
+          example: "2023-08-14"
+        _createdAt:
+          type: string
+          format: date-time
+          readOnly: true
+          description: Creation timestamp of the entity.
+          example: "2023-08-14T18:07:59.502555Z"
+        _createdBy:
+          type: string
+          format: uuid
+          readOnly: true
+          description: ID of the user who created the entity.
+          example: "00000000-0000-0000-0000-000000000000"
+        _updatedAt:
+          type: string
+          format: date-time
+          readOnly: true
+          description: Update timestamp of the entity.
+          example: "2023-08-14T18:07:59.502555Z"
+        _updatedBy:
+          type: string
+          format: uuid
+          readOnly: true
+          description: ID of the user who updated the entity.
+          example: "00000000-0000-0000-0000-000000000000"
+
+    CustomerCreate:
+      type: object
+      description: Create a customer.
+      required:
+        - status
+        - registrationNumber
+        - companyType
+        - name
+        - shortName
+        - seat
+        - activityClassifications
+        - representatives
+        - statisticalNumber
+        - taxNumber
+        - accountOpeningReason
+      additionalProperties: false
+      properties:
+        uuid:
+          $ref: '#/components/schemas/UUIDReference'
+        status:
+          $ref: '#/components/schemas/enum_customerStatus'
+        registrationNumber:
+          type: string
+          description: Registration number of the customer (company reg. or sole prop. reg number).
+          example: "12345678"
+        companyType:
+          type: string
+          description: Company type of the customer.
+          example: "Sole Proprietorship"
+        name:
+          type: string
+          description: Company name of the customer.
+          example: "John Doe Korlátolt Felelősségű Társaság"
+        shortName:
+          type: string
+          description: Short company name of the customer.
+          example: "John Doe Kft."
+        seat:
+          type: string
+          description: Registered seat address of the customer.
+          example: "1234 Budapest, John Doe utca 1."
+        activityClassifications:
+          type: array
+          description: List of activity classifications of the customer.
+          items:
+            $ref: '#/components/schemas/ActivityClassificationCreate'
+        representatives:
+          type: array
+          description: List of representatives for the customer company.
+          items:
+            $ref: '#/components/schemas/RepresentativeCreate'
+        statisticalNumber:
+          description: Statistical number of the customer.
+          type: string
+          # https://www.ksh.hu/statisztikai-szamjel
+          # pattern: '^\d{8} \d{4} \d{3} \d{2}$'
+          example: "12345678 6202 117 01"
+        taxNumber:
+          description: Tax number of the customer.
+          # pattern: '^\d{8}-\d-\d{2}$'
+          type: string
+          example: "12345678-1-12"
+        taxNumberStatus:
+          $ref: '#/components/schemas/enum_taxNumberStatus'
+        accountOpeningReason:
+          type: string
+          description: Reason of account opening, provided during registration
+          example: "Account opening reason"
+        diPocketCorpClientId:
+          type: string
+          description: Corporation Client ID in DiPocket
+          example: "1234567890"
+        scoringResult:
+          $ref: '#/components/schemas/enum_scoringResultType'
+        scoringLimits:
+          $ref: '#/components/schemas/ScoringLimitsCreate'
+        requestCreditCard:
+          type: boolean
+          description: Request credit card.
+          example: true
+        requestVirtualCreditCard:
+          type: boolean
+          description: Request virtual credit card.
+          example: true
+        shortId:
+          type: string
+          description: Short ID of the Customer.
+          minLength: 8
+          maxLength: 8
+          example: "12345678"
+        email:
+          type: string
+          description: email address
+          example: "email@domain.hu"
+        reinforcedProcessFlag:
+          type: string
+          format: date
+          description: Reinforced process flag
+          example: "2023-08-14"
+    CustomerUpdate:
+      type: object
+      description: Update a Customer's top level properties.
+      additionalProperties: false
+      properties:
+        uuid:
+          $ref: '#/components/schemas/UUIDReference'
+        status:
+          $ref: '#/components/schemas/enum_customerStatus'
+        registrationNumber:
+          type: string
+          description: Registration number of the customer (company reg. or sole prop. reg number).
+          example: "12345678"
+        companyType:
+          type: string
+          description: Company type of the customer.
+          example: "Sole Proprietorship"
+        name:
+          type: string
+          description: Company name of the customer.
+          example: "John Doe Korlátolt Felelősségű Társaság"
+        shortName:
+          type: string
+          description: Short company name of the customer.
+          example: "John Doe Kft."
+        seat:
+          type: string
+          description: Registered seat address of the customer.
+          example: "1234 Budapest, John Doe utca 1."
+        statisticalNumber:
+          description: Statistical number of the customer.
+          type: string
+          # https://www.ksh.hu/statisztikai-szamjel
+          # pattern: '^\d{8} \d{4} \d{3} \d{2}$'
+          example: "12345678 6202 117 01"
+        taxNumber:
+          type: string
+          description: Tax number of the customer.
+          # pattern: '^\d{8}-\d-\d{2}$'
+          example: "12345678-1-12"
+        taxNumberStatus:
+          $ref: '#/components/schemas/enum_taxNumberStatus'
+        accountOpeningReason:
+          type: string
+          description: Reason of account opening, provided during registration
+          example: "Account opening reason"
+        diPocketCorpClientId:
+          type: string
+          description: Corporation Client ID in DiPocket
+          example: "1234567890"
+        scoringResult:
+          $ref: '#/components/schemas/enum_scoringResultType'
+        requestCreditCard:
+          type: boolean
+          description: Request credit card.
+          example: true
+        requestVirtualCreditCard:
+          type: boolean
+          description: Request virtual credit card.
+          example: true
+        shortId:
+          type: string
+          description: Short ID of the Customer.
+          minLength: 8
+          maxLength: 8
+          example: "12345678"
+        email:
+          type: string
+          description: email address
+          example: "email@domain.hu"
+        reinforcedProcessFlag:
+          type: string
+          format: date
+          description: Reinforced process flag
+          example: "2023-08-14"
+    Customers:
+      type: array
+      items:
+        $ref: '#/components/schemas/Customer'
+
+    DeclarationsStates:
+      type: array
+      items:
+        $ref: '#/components/schemas/DeclarationsState'
+    DeclarationsState:
+      type: object
+      description: An object that represents the state of various declarations.
+      required:
+        - uuid
+        - gtc
+        - kyc
+        - marketing
+        - contact
+        - research
+        - profiling
+        - _createdAt
+        - _createdBy
+        - _updatedAt
+        - _updatedBy
+      properties:
+        uuid:
+          $ref: '#/components/schemas/UUID'
+        gtc:
+          type: boolean
+          description: General Terms and Conditions
+          example: true
+        kyc:
+          type: boolean
+          description: Know Your Customer
+          example: true
+        marketing:
+          type: boolean
+          description: Marketing
+          example: true
+        contact:
+          type: boolean
+          description: Contact
+          example: true
+        research:
+          type: boolean
+          description: Research
+          example: true
+        profiling:
+          type: boolean
+          description: Profiling
+          example: true
+        _createdAt:
+          type: string
+          format: date-time
+          readOnly: true
+          description: Creation timestamp of the entity.
+          example: "2023-08-14T18:07:59.502555Z"
+        _createdBy:
+          type: string
+          format: uuid
+          readOnly: true
+          description: ID of the user who created the entity.
+          example: "00000000-0000-0000-0000-000000000000"
+        _updatedAt:
+          type: string
+          format: date-time
+          readOnly: true
+          description: Update timestamp of the entity.
+          example: "2023-08-14T18:07:59.502555Z"
+        _updatedBy:
+          type: string
+          format: uuid
+          readOnly: true
+          description: ID of the user who updated the entity.
+          example: "00000000-0000-0000-0000-000000000000"
+    DeclarationsStateCreate:
+      type: object
+      description: An object that represents the state of various declarations.
+      required:
+        - gtc
+        - kyc
+        - marketing
+        - contact
+        - research
+        - profiling
+      properties:
+        uuid:
+          $ref: '#/components/schemas/UUID'
+        gtc:
+          type: boolean
+          description: General Terms and Conditions
+          example: true
+        kyc:
+          type: boolean
+          description: Know Your Customer
+          example: true
+        marketing:
+          type: boolean
+          description: Marketing
+          example: true
+        contact:
+          type: boolean
+          description: Contact
+          example: true
+        research:
+          type: boolean
+          description: Research
+          example: true
+        profiling:
+          type: boolean
+          description: Profiling
+          example: true
+    DeclarationsStateUpdate:
+      type: object
+      description: An object that represents the state of various declarations.
+      properties:
+        gtc:
+          type: boolean
+          description: General Terms and Conditions
+          example: true
+        kyc:
+          type: boolean
+          description: Know Your Customer
+          example: true
+        marketing:
+          type: boolean
+          description: Marketing
+          example: true
+        contact:
+          type: boolean
+          description: Contact
+          example: true
+        research:
+          type: boolean
+          description: Research
+          example: true
+        profiling:
+          type: boolean
+          description: Profiling
+          example: true
+
+
+    Device:
+      type: object
+      description: An object that represents a device.
+      required:
+        - uuid
+        - status
+        - installationId
+        - type
+        - brand
+        - name
+        - registeredAt
+        - osVersion
+        - osType
+        - _createdAt
+        - _createdBy
+        - _updatedAt
+        - _updatedBy
+      properties:
+        uuid:
+          $ref: '#/components/schemas/UUID'
+        userId:
+          $ref: '#/components/schemas/UUID'
+        status:
+          $ref: '#/components/schemas/enum_deviceStatus'
+        installationId:
+          type: string
+          title: Device installation ID
+          description: |
+            The identifier is a unique identifier of the device (installation).
+            The identifier is used to identify the device in the authentication process.
+            More info: https://backstage.forgerock.com/docs/sdks/latest/how-to/device-profile/device-id.html
+          example: "d50cdb5ce8d055a3-86bd35e1b975a14d76b40940112c2380264c8efd"
+        type:
+          type: string
+          description: Type of the device.
+          example: Galaxy S21
+        brand:
+          type: string
+          description: Manufacturer of the device.
+          example: Apple
+        name:
+          type: string
+          description: Name of the device. (editable by user)
+          example: Peter's iPhone
+        registeredAt:
+          type: string
+          description: Date of device registration.
+          format: date-time
+          example: "2021-11-01T12:00:00Z"
+        osVersion:
+          type: string
+          description: Version of the OS ran on the device.
+          example: "14.8"
+        osType:
+          type: string
+          description: Type of the OS ran on the device.
+          example: iOS
+        lastLoginAt:
+          title: Date of the last login.
+          type: string
+          format: date-time
+          example: "2021-11-01T12:00:00Z"
+        pushToken:
+          title: PUSH token
+          type: string
+          example: "eNbfs-CFSueEREj9Ho8-fL:APA91bG6JWv0odihJl9OihXw3VFt4b8zweHvaRJO1BOY54iA6nYRWaj36kVDKy5F9u3V7yy6-IR4eQA6ewaadys03KxSDeOdIIqn9UyNziIFMmvw0WXu2AWz46VAo-6HLX3pRIIBnZEF"
+        pushArn:
+          title: Amazon Resource Name for push notifications
+          type: string
+          example: "arn:aws:sns:eu-central-1:218175819274:endpoint/APNS/Binx-ios/031888b2-4c8d-3cd5-8acb-1b82cf4646ce"
+        _createdAt:
+          type: string
+          format: date-time
+          readOnly: true
+          description: Creation timestamp of the entity.
+          example: "2023-08-14T18:07:59.502555Z"
+        _createdBy:
+          type: string
+          format: uuid
+          readOnly: true
+          description: ID of the user who created the entity.
+          example: "00000000-0000-0000-0000-000000000000"
+        _updatedAt:
+          type: string
+          format: date-time
+          readOnly: true
+          description: Update timestamp of the entity.
+          example: "2023-08-14T18:07:59.502555Z"
+        _updatedBy:
+          type: string
+          format: uuid
+          readOnly: true
+          description: ID of the user who updated the entity.
+          example: "00000000-0000-0000-0000-000000000000"
+
+    DeviceCreate:
+      type: object
+      description: Create a Device.
+      required:
+        - status
+        - installationId
+        - type
+        - brand
+        - name
+        - registeredAt
+        - osVersion
+        - osType
+      properties:
+        uuid:
+          $ref: '#/components/schemas/UUIDReference'
+        status:
+          $ref: '#/components/schemas/enum_deviceStatus'
+        installationId:
+          type: string
+          uniqueItems: true
+          title: Device installation ID
+          description: |
+            The identifier is a unique identifier of the device (installation).
+            The identifier is used to identify the device in the authentication process.
+            More info: https://backstage.forgerock.com/docs/sdks/latest/how-to/device-profile/device-id.html
+          example: "d50cdb5ce8d055a3-86bd35e1b975a14d76b40940112c2380264c8efd"
+        type:
+          type: string
+          description: Type of the device.
+          example: Galaxy S21
+        brand:
+          type: string
+          description: Manufacturer of the device.
+          example: Apple
+        name:
+          type: string
+          description: Name of the device.
+          example: Peter's iPhone
+        registeredAt:
+          type: string
+          description: Date of device registration.
+          format: date-time
+          example: "2021-11-01T12:00:00Z"
+        osVersion:
+          type: string
+          description: Version of the OS ran on the device.
+          example: "14.8"
+        osType:
+          type: string
+          description: Type of the OS ran on the device.
+          example: iOS
+        pushToken:
+          title: PUSH token
+          type: string
+          example: "88e788e0a49d7a08fe51a0d43cd2fcbe142c1c37baa51bd6b08b6f422aa25056"
+        pushArn:
+          title: Amazon Resource Name for push notifications
+          type: string
+          example: "arn:aws:sns:eu-central-1:218175819274:endpoint/APNS/Binx-ios/031888b2-4c8d-3cd5-8acb-1b82cf4646ce"
+    DeviceUpdate:
+      type: object
+      description: Update Device's top properties.
+      properties:
+        uuid:
+          $ref: '#/components/schemas/UUIDReference'
+        status:
+          $ref: '#/components/schemas/enum_deviceStatus'
+        installationId:
+          type: string
+          uniqueItems: true
+          title: Device installation ID
+          description: |
+            The identifier is a unique identifier of the device (installation).
+            The identifier is used to identify the device in the authentication process.
+            More info: https://backstage.forgerock.com/docs/sdks/latest/how-to/device-profile/device-id.html
+          example: "d50cdb5ce8d055a3-86bd35e1b975a14d76b40940112c2380264c8efd"
+        type:
+          type: string
+          description: Type of the device.
+          example: Galaxy S21
+        brand:
+          type: string
+          description: Manufacturer of the device.
+          example: Apple
+        name:
+          type: string
+          description: Name of the device.
+          example: Peter's iPhone
+        registeredAt:
+          type: string
+          description: Date of device registration.
+          format: date-time
+          example: "2021-11-01T12:00:00Z"
+        osVersion:
+          type: string
+          description: Version of the OS ran on the device.
+          example: "14.8"
+        osType:
+          type: string
+          description: Type of the OS ran on the device.
+          example: iOS
+        pushToken:
+          title: PUSH token
+          type: string
+          example: "88e788e0a49d7a08fe51a0d43cd2fcbe142c1c37baa51bd6b08b6f422aa25056"
+        pushArn:
+          title: Amazon Resource Name for push notifications
+          type: string
+          example: "arn:aws:sns:eu-central-1:218175819274:endpoint/APNS/Binx-ios/031888b2-4c8d-3cd5-8acb-1b82cf4646ce"
+        userId:
+          $ref: '#/components/schemas/UUIDReference'
+    Devices:
+      type: array
+      items:
+        $ref: '#/components/schemas/Device'
+    IBAN:
+      type: string
+      description: International Bank Account Number
+      pattern: ^[A-Z]{2}[0-9]{2}[A-Z0-9]{4}[0-9]{7}([A-Z0-9]?){0,16}$
+      example: HU42117730161111101800000000
+    DocImageStorageLocations:
+      description: Document Image Storage locations (e.g. S3 bucket path, arn, etc).
+      type: array
+      items:
+        $ref: '#/components/schemas/DocImageStorageLocation'
+    DocImageStorageLocation:
+      description: Document Image Storage locations (e.g. S3)
+      required:
+        - uuid
+        - location
+        - side
+        - _createdAt
+        - _createdBy
+        - _updatedAt
+        - _updatedBy
+      properties:
+        uuid:
+          $ref: '#/components/schemas/UUID'
+        location:
+          type: string
+          description: The location of the document within a storage (e.g. S3 bucket path, arn, etc).
+          example: "something"
+        side:
+          $ref: '#/components/schemas/enum_paper_side'
+        _createdAt:
+          type: string
+          format: date-time
+          readOnly: true
+          description: Creation timestamp of the entity.
+          example: "2023-08-14T18:07:59.502555Z"
+        _createdBy:
+          type: string
+          format: uuid
+          readOnly: true
+          description: ID of the user who created the entity.
+          example: "00000000-0000-0000-0000-000000000000"
+        _updatedAt:
+          type: string
+          format: date-time
+          readOnly: true
+          description: Update timestamp of the entity.
+          example: "2023-08-14T18:07:59.502555Z"
+        _updatedBy:
+          type: string
+          format: uuid
+          readOnly: true
+          description: ID of the user who updated the entity.
+          example: "00000000-0000-0000-0000-000000000000"
+    DocImageStorageLocationsCreate:
+      description: Document Image Storage locations (e.g. S3 bucket path, arn, etc).
+      type: array
+      items:
+        $ref: '#/components/schemas/DocImageStorageLocationCreate'
+    DocImageStorageLocationCreate:
+      description: Document Image Storage location (e.g. S3 bucket path, arn, etc).
+      required:
+        - location
+        - side
+      properties:
+        uuid:
+          $ref: '#/components/schemas/UUID'
+        location:
+          type: string
+          description: The location of the document within a storage (e.g. S3 bucket path, arn, etc).
+          example: "something"
+        side:
+          $ref: '#/components/schemas/enum_paper_side'
+    IdentityDocuments:
+      description: An array of identity documents
+      type: array
+      items:
+        $ref: '#/components/schemas/IdentityDocument'
+    IdentityDocument:
+      type: object
+      description: An identity document
+      title: IdentityDocument
+      required:
+        - uuid
+        - type
+        - id
+        - _createdAt
+        - _createdBy
+        - _updatedAt
+        - _updatedBy
+      additionalProperties: false
+      properties:
+        uuid:
+          $ref: '#/components/schemas/UUID'
+        type:
+          $ref: '#/components/schemas/enum_identityDocumentType'
+        id:
+          description: The ID of the document.
+          type: string
+          pattern: ^[A-Z0-9]+$
+          example: ID12345678
+        locations:
+          oneOf:
+            - $ref: '#/components/schemas/ListOfUUIDs'
+            - $ref: '#/components/schemas/DocImageStorageLocations'
+        _createdAt:
+          type: string
+          format: date-time
+          readOnly: true
+          description: Creation timestamp of the entity.
+          example: "2023-08-14T18:07:59.502555Z"
+        _createdBy:
+          type: string
+          format: uuid
+          readOnly: true
+          description: ID of the user who created the entity.
+          example: "00000000-0000-0000-0000-000000000000"
+        _updatedAt:
+          type: string
+          format: date-time
+          readOnly: true
+          description: Update timestamp of the entity.
+          example: "2023-08-14T18:07:59.502555Z"
+        _updatedBy:
+          type: string
+          format: uuid
+          readOnly: true
+          description: ID of the user who updated the entity.
+          example: "00000000-0000-0000-0000-000000000000"
+
+    IdentityDocumentCreate:
+      type: object
+      description: An identity document
+      title: IdentityDocument
+      required:
+        - type
+        - id
+      additionalProperties: false
+      properties:
+        uuid:
+          $ref: '#/components/schemas/UUIDReference'
+        type:
+          $ref: '#/components/schemas/enum_identityDocumentType'
+        id:
+          description: The ID of the document.
+          type: string
+          # only uppercase english alphabet and numbers
+          pattern: ^[A-Z0-9]+$
+          example: ID12345678
+        locations:
+          $ref: '#/components/schemas/DocImageStorageLocationsCreate'
+
+    Invitation:
+      type: object
+      description: |
+        An invitation\
+        taxNumber or customerId is required\
+        `invitedName`, `invitedBirthDate`, `invitedBirthPlace`, `invitedMothersMaidenName` must be provided if `senderRegistrationId` is provided.
+      title: Invitation
+      required:
+        - uuid
+        - invitationCode
+        - invitedName
+        - invitedPhoneNumber
+        - _createdAt
+        - _createdBy
+        - _updatedAt
+        - _updatedBy
+      additionalProperties: false
+      properties:
+        uuid:
+          $ref: '#/components/schemas/UUID'
+        userId:
+          # User who sent the invitation
+          $ref: '#/components/schemas/UUIDReference'
+        invitationCode:
+          description: The ID of the invitation.
+          type: string
+          minLength: 6
+          maxLength: 6
+          pattern: ^[A-Z0-9]{6}$
+          example: ID1234
+        invitedName:
+          type: string
+          description: The name of the invited user.
+          example: John Doe
+        invitedBirthDate:
+          type: string
+          description: The birth date of the invited user.
+          format: date
+          example: 1990-01-01
+        invitedBirthPlace:
+          type: string
+          description: The birth place of the invited user.
+          example: Budapest
+        invitedMothersMaidenName:
+          type: string
+          description: The mother's maiden name of the invited user.
+          example: Mary Doe
+        invitedPhoneNumber:
+          type: string
+          description: The phone number of the invited user.
+          pattern: ^\+[1-9]\d{1,14}$
+          example: "+36201234567"
+        taxNumber:
+          type: string
+          description: The tax number of the inviting company.
+          # pattern: ^[0-9]{8}-[0-9]-[0-9]{2}$
+          example: 12345678-1-42
+        customerId:
+          # Customer who sent the invitation
+          $ref: '#/components/schemas/UUIDReference'
+        companyName:
+          type: string
+          description: The short name of the inviting company.
+          example: ACME Inc.
+        senderRegistrationId:
+          # The registration ID of the inviting User.
+          $ref: '#/components/schemas/UUIDReference'
+        receiverRegistrationId:
+          # In which registration process the invitation was used.
+          $ref: '#/components/schemas/UUIDReference'
+        _createdAt:
+          type: string
+          format: date-time
+          readOnly: true
+          description: Creation timestamp of the entity.
+          example: "2023-08-14T18:07:59.502555Z"
+        _createdBy:
+          type: string
+          format: uuid
+          readOnly: true
+          description: ID of the user who created the entity.
+          example: "00000000-0000-0000-0000-000000000000"
+        _updatedAt:
+          type: string
+          format: date-time
+          readOnly: true
+          description: Update timestamp of the entity.
+          example: "2023-08-14T18:07:59.502555Z"
+        _updatedBy:
+          type: string
+          format: uuid
+          readOnly: true
+          description: ID of the user who updated the entity.
+          example: "00000000-0000-0000-0000-000000000000"
+
+    Invitations:
+      description: List of invitations
+      type: array
+      items:
+        $ref: '#/components/schemas/Invitation'
+    InvitationCreate:
+      type: object
+      description: |
+        An invitation\
+        taxNumber or customerId is required\
+        `invitedName`, `invitedBirthDate`, `invitedBirthPlace`, `invitedMothersMaidenName` must be provided if `senderRegistrationId` is provided.
+
+      title: Invitation
+      required:
+        - invitationCode
+        - invitedName
+        - invitedPhoneNumber
+      additionalProperties: false
+      properties:
+        uuid:
+          $ref: '#/components/schemas/UUID'
+        invitationCode:
+          type: string
+          minLength: 6
+          maxLength: 6
+          pattern: ^[A-Z0-9]{6}$
+          description: The ID of the invitation.
+          example: ID1234
+        invitedName:
+          type: string
+          description: The name of the invited user.
+          example: John Doe
+        invitedBirthDate:
+          type: string
+          description: The birth date of the invited user.
+          format: date
+          example: 1990-01-01
+        invitedBirthPlace:
+          type: string
+          description: The birth place of the invited user.
+          example: Budapest
+        invitedMothersMaidenName:
+          type: string
+          description: The mother's maiden name of the invited user.
+          example: Mary Doe
+        invitedPhoneNumber:
+          type: string
+          description: The phone number of the invited user.
+          pattern: ^\+[1-9]\d{1,14}$
+          example: "+36201234567"
+        taxNumber:
+          type: string
+          description: The tax number of the inviting company.
+          # pattern: ^[0-9]{8}-[0-9]-[0-9]{2}$
+          example: 12345678-1-42
+        customerId:
+          # Customer who sent the invitation
+          $ref: '#/components/schemas/UUIDReference'
+        companyName:
+          type: string
+          description: The short name of the inviting company.
+          example: ACME Inc.
+        senderRegistrationId:
+          # The registration ID of the inviting User.
+          $ref: '#/components/schemas/UUIDReference'
+        receiverRegistrationId:
+          # In which registration process the invitation was used.
+          $ref: '#/components/schemas/UUIDReference'
+    InvitationUpdate:
+      type: object
+      description: Track the Invitation process.
+      title: Invitation Update
+      additionalProperties: false
+      properties:
+        senderRegistrationId:
+          # The registration ID of the inviting User.
+          $ref: '#/components/schemas/UUIDReference'
+        receiverRegistrationId:
+          # In which registration process the invitation was used.
+          $ref: '#/components/schemas/UUIDReference'
+
+    ListOfUUIDs:
+      type: array
+      items:
+        $ref: '#/components/schemas/UUID'
+    LoginSuccess:
+      x-note: Structure is depend on Device structure.
+      type: object
+      description: An object that represents a device.
+      required:
+        - installationId
+        - lastLoginAt
+      properties:
+        installationId:
+          type: string
+          title: Device installation ID
+          example: "d50cdb5ce8d055a3-86bd35e1b975a14d76b40940112c2380264c8efd"
+        type:
+          type: string
+          description: Type of the device.
+          example: Galaxy S21
+        brand:
+          type: string
+          description: Manufacturer of the device.
+          example: Apple
+        name:
+          type: string
+          description: Name of the device. (editable by user)
+          example: Peter's iPhone
+        osVersion:
+          type: string
+          description: Version of the OS ran on the device.
+          example: "14.8"
+        osType:
+          type: string
+          description: Type of the OS ran on the device.
+          example: iOS
+        lastLoginAt:
+          title: Date of the last login.
+          type: string
+          format: date-time
+          example: "2021-11-01T12:00:00Z"
+
+    MoneyAmount:
+      type: object
+      description: An object that represents a money amount.
+      required:
+        - uuid
+        - amount
+        - currency
+        - _createdAt
+        - _createdBy
+        - _updatedAt
+        - _updatedBy
+      additionalProperties: false
+      properties:
+        uuid:
+          $ref: '#/components/schemas/UUID'
+        amount:
+          type: number
+          description: Amount of money.
+          example: 123456789.12
+        currency:
+          $ref: '#/components/schemas/Currency'
+        _createdAt:
+          type: string
+          format: date-time
+          readOnly: true
+          description: Creation timestamp of the entity.
+          example: "2023-08-14T18:07:59.502555Z"
+        _createdBy:
+          type: string
+          format: uuid
+          readOnly: true
+          description: ID of the user who created the entity.
+          example: "00000000-0000-0000-0000-000000000000"
+        _updatedAt:
+          type: string
+          format: date-time
+          readOnly: true
+          description: Update timestamp of the entity.
+          example: "2023-08-14T18:07:59.502555Z"
+        _updatedBy:
+          type: string
+          format: uuid
+          readOnly: true
+          description: ID of the user who updated the entity.
+          example: "00000000-0000-0000-0000-000000000000"
+
+    MoneyAmountCreate:
+      type: object
+      description: An object that represents a money amount.
+      required:
+        - amount
+        - currency
+      additionalProperties: false
+      properties:
+        uuid:
+          $ref: '#/components/schemas/UUIDReference'
+        amount:
+          type: number
+          description: Amount of money.
+          example: 123456789.12
+        currency:
+          $ref: '#/components/schemas/Currency'
+    MoneyAmountUpdate:
+      type: object
+      description: An object that represents a money amount.
+      required:
+        - amount
+        - currency
+      additionalProperties: false
+      properties:
+        amount:
+          type: number
+          description: Amount of money.
+          example: 123456789.12
+        currency:
+          $ref: '#/components/schemas/Currency'
+
+    Partner:
+      type: object
+      description: |
+        Partner for Customer.\
+        If `_includes=customers` applied, then `customer` will contain the customer object, and `customerId` will be not present.
+
+      required:
+        - uuid
+        - name
+        - shortName
+        - identifierType
+        - identifier
+        - isFavorite
+        - _createdAt
+        - _createdBy
+        - _updatedAt
+        - _updatedBy
+      additionalProperties: false
+      properties:
+        uuid:
+          $ref: '#/components/schemas/UUIDReference'
+        name:
+          type: string
+          description: Partner name
+          example: ACME Inc.
+        shortName:
+          type: string
+          description: Partner short name
+          example: ACME
+        identifierType:
+          $ref: '#/components/schemas/enum_partnerIdentifierType'
+        identifier:
+          type: string
+          description: Partner identifier by identifier type
+          example: 12345678-1-42
+        isFavorite:
+          type: boolean
+          description: Is partner favorite
+          example: true
+        customerId:
+          # Customer reference
+          $ref: '#/components/schemas/UUIDReference'
+        customer:
+          # Customer reference
+          $ref: '#/components/schemas/Customer'
+        _createdAt:
+          type: string
+          format: date-time
+          readOnly: true
+          description: Creation timestamp of the entity.
+          example: "2023-08-14T18:07:59.502555Z"
+        _createdBy:
+          type: string
+          format: uuid
+          readOnly: true
+          description: ID of the user who created the entity.
+          example: "00000000-0000-0000-0000-000000000000"
+        _updatedAt:
+          type: string
+          format: date-time
+          readOnly: true
+          description: Update timestamp of the entity.
+          example: "2023-08-14T18:07:59.502555Z"
+        _updatedBy:
+          type: string
+          format: uuid
+          readOnly: true
+          description: ID of the user who updated the entity.
+          example: "00000000-0000-0000-0000-000000000000"
+
+    PartnerCreate:
+      type: object
+      description: Create Partner for Customer
+      required:
+        - name
+        - shortName
+        - identifierType
+        - identifier
+        - isFavorite
+      additionalProperties: false
+      properties:
+        uuid:
+          $ref: '#/components/schemas/UUIDReference'
+        name:
+          type: string
+          description: Partner name
+          example: ACME Inc.
+        shortName:
+          type: string
+          description: Partner short name
+          example: ACME
+        identifierType:
+          $ref: '#/components/schemas/enum_partnerIdentifierType'
+        identifier:
+          type: string
+          description: Partner identifier by identifier type
+          example: 12345678-1-42
+        isFavorite:
+          type: boolean
+          description: Is partner favorite
+          example: true
+    PartnerUpdate:
+      type: object
+      description: Update Partner
+      additionalProperties: false
+      properties:
+        name:
+          type: string
+          description: Partner name
+          example: ACME Inc.
+        shortName:
+          type: string
+          description: Partner short name
+          example: ACME
+        identifier:
+          type: string
+          description: Partner identifier by identifier type
+          example: 12345678-1-42
+        isFavorite:
+          type: boolean
+          description: Is partner favorite
+          example: true
+    Partners:
+      description: A list of Partners.
+      type: array
+      items:
+        $ref: '#/components/schemas/Partner'
+
+    Persona:
+      type: object
+      description: |
+        An object that represents a persona. \
+        `userId` or `user` must be present. \
+        `customerId` or `customer` must be present.
+      additionalProperties: false
+      required:
+        # see AbstractEntity
+        - uuid
+        - phone
+        - phoneVerified
+        - email
+        - emailVerified
+        - _createdAt
+        - _createdBy
+        - _updatedAt
+        - _updatedBy
+      properties:
+        uuid:
+          $ref: '#/components/schemas/UUIDReference'
+        userId:
+          # An identifier that uniquely identifies the user.
+          $ref: '#/components/schemas/UUID'
+        user:
+          $ref: '#/components/schemas/User'
+        customerId:
+          # An identifier that uniquely identifies the customer.
+          $ref: '#/components/schemas/UUID'
+        customer:
+          $ref: '#/components/schemas/Customer'
+        email:
+          description: Email address of the user.
+          type: string
+          format: email
+          # pattern: ^[\p{L}\w.-]+@[\p{L}0-9]+\.[a-z]{2,}$
+          example: jhon.doe@acme.hu
+        emailVerified:
+          type: boolean
+          description: Is email verified?
+          example: true
+        phone:
+          description: Phone number of the user.
+          type: string
+          pattern: ^\+[1-9]\d{1,14}$
+          example: "+36301234567"
+        phoneVerified:
+          type: boolean
+          description: Is phone verified?
+          example: true
+        personaRoles:
+          oneOf:
+            - $ref: '#/components/schemas/ListOfUUIDs'
+            - $ref: '#/components/schemas/PersonaRoles'
+        declarationsId:
+          $ref: '#/components/schemas/UUID'
+        declarations:
+          $ref: '#/components/schemas/DeclarationsState'
+        _createdAt:
+          type: string
+          format: date-time
+          readOnly: true
+          description: Creation timestamp of the entity.
+          example: "2023-08-14T18:07:59.502555Z"
+        _createdBy:
+          type: string
+          format: uuid
+          readOnly: true
+          description: ID of the user who created the entity.
+          example: "00000000-0000-0000-0000-000000000000"
+        _updatedAt:
+          type: string
+          format: date-time
+          readOnly: true
+          description: Update timestamp of the entity.
+          example: "2023-08-14T18:07:59.502555Z"
+        _updatedBy:
+          type: string
+          format: uuid
+          readOnly: true
+          description: ID of the user who updated the entity.
+          example: "00000000-0000-0000-0000-000000000000"
+
+    PersonaCreate:
+      type: object
+      description: |
+        Create a persona.\
+        Roles can be added later.
+      required:
+        - userId
+        - customerId
+        - email
+        - emailVerified
+        - phone
+        - phoneVerified
+        # TODO Must be required - declarations
+      additionalProperties: false
+      properties:
+        uuid:
+          $ref: '#/components/schemas/UUIDReference'
+        customerId:
+          # An identifier that uniquely identifies the customer.
+          $ref: '#/components/schemas/UUIDReference'
+        userId:
+          # An identifier that uniquely identifies the user.
+          $ref: '#/components/schemas/UUIDReference'
+        email:
+          type: string
+          format: email
+          description: Email address of the user.
+          # pattern: ^[\w.-]+@[a-z]+\.[a-z]{2,3}$
+          example: john.doe@acme.hu
+        emailVerified:
+          type: boolean
+          description: Is email verified?
+          example: true
+        phone:
+          description: Phone number of the user.
+          type: string
+          pattern: ^\+[1-9]\d{1,14}$
+          example: "+36301234567"
+        phoneVerified:
+          type: boolean
+          description: Is phone verified?
+          example: true
+        personaRoles:
+          # A list of roles' ID that are assigned to the persona.
+          $ref: '#/components/schemas/PersonaRolesCreate'
+        declarations:
+          $ref: '#/components/schemas/DeclarationsStateCreate'
+    PersonaUpdate:
+      type: object
+      description: |
+        Update a Persona top level properties.
+      additionalProperties: false
+      properties:
+        email:
+          description: Email address of the user.
+          type: string
+          format: email
+          # pattern: ^[\w.-]+@[a-z]+\.[a-z]{2,3}$
+          example: john.doe@acme.hu
+        emailVerified:
+          type: boolean
+          description: Is email verified?
+          example: true
+        phone:
+          description: Phone number of the user.
+          type: string
+          pattern: ^\+[1-9]\d{1,14}$
+          example: "+36301234567"
+        phoneVerified:
+          type: boolean
+          description: Is phone verified?
+          example: true
+    Personas:
+      description: A list of personas.
+      type: array
+      items:
+        $ref: '#/components/schemas/Persona'
+
+    Problem:
+      type: object
+      properties:
+        type:
+          type: string
+          format: uri-reference
+          description: >
+            A URI reference that uniquely identifies the problem type only in the
+            context of the provided API. Opposed to the specification in RFC-7807,
+            it is neither recommended to be dereferenceable and point to a
+            human-readable documentation nor globally unique for the problem type.
+          default: 'about:blank'
+          example: '/some/uri-reference'
+        title:
+          type: string
+          description: >
+            A short description of the problem type. Written in English and readable
+            for engineers, usually not suited for non-technical stakeholders and
+            not localized.
+          example: some title for the error situation
+        status:
+          type: integer
+          format: int32
+          description: >
+            The HTTP status code generated by the origin server for this occurrence
+            of the problem.
+          minimum: 100
+          maximum: 600
+          exclusiveMaximum: true
+        detail:
+          type: string
+          description: >
+            A human-readable explanation specific to this occurrence of the
+            problem that is helpful to locate the problem and give advice on how
+            to proceed. Written in English and readable for engineers, usually not
+            suited for non-technical stakeholders and not localized.
+          example: some description for the error situation
+        instance:
+          type: string
+          format: uri-reference
+          description: >
+            A URI reference that identifies the specific occurrence of the problem,
+            e.g. by adding a fragment identifier or sub-path to the problem type.
+            It may be used to locate the root of this problem in the source code.
+          example: '/some/uri-reference#specific-occurrence-context'
+
+    Representative:
+      type: object
+      required:
+        - uuid
+        - name
+        - address
+        - mode
+        - naturalPerson
+        - _createdAt
+        - _createdBy
+        - _updatedAt
+        - _updatedBy
+      additionalProperties: false
+      properties:
+        uuid:
+          $ref: '#/components/schemas/UUID'
+        name:
+          type: string
+          description: Name of the representative
+          example: John Doe
+        mothersMaidenName:
+          type: string
+          description: Representative mothers maiden name
+          example: Jane Doe
+        birthDate:
+          type: string
+          description: Birthdate of the representative
+          format: date
+          example: 2019-01-01
+        address:
+          type: string
+          description: Address of the company representative.
+          example: 1111 Budapest, Kossuth Lajos utca 1-3.
+        taxNumber:
+          description: Tax number of the company representative.
+          type: string
+          # pattern: ^\d{8}-\d-\d{2}$
+          example: 12345678-1-42
+        mode:
+          $ref: '#/components/schemas/enum_representativeMode'
+        position:
+          type: string
+          description: Official position of the representative in the company.
+          example: CEO
+        naturalPerson:
+          type: boolean
+          description: Representative is a natural person
+          example: true
+        _createdAt:
+          type: string
+          format: date-time
+          readOnly: true
+          description: Creation timestamp of the entity.
+          example: "2023-08-14T18:07:59.502555Z"
+        _createdBy:
+          type: string
+          format: uuid
+          readOnly: true
+          description: ID of the user who created the entity.
+          example: "00000000-0000-0000-0000-000000000000"
+        _updatedAt:
+          type: string
+          format: date-time
+          readOnly: true
+          description: Update timestamp of the entity.
+          example: "2023-08-14T18:07:59.502555Z"
+        _updatedBy:
+          type: string
+          format: uuid
+          readOnly: true
+          description: ID of the user who updated the entity.
+          example: "00000000-0000-0000-0000-000000000000"
+
+    RepresentativeCreate:
+      type: object
+      required:
+        - name
+        - address
+        - mode
+        - naturalPerson
+      additionalProperties: false
+      properties:
+        uuid:
+          $ref: '#/components/schemas/UUIDReference'
+        name:
+          type: string
+          description: Name of the representative
+          example: John Doe
+        mothersMaidenName:
+          type: string
+          description: Representative's mother's maiden name
+          example: Jane Doe
+        birthDate:
+          type: string
+          description: Birthdate of the representative
+          format: date
+          example: 2019-01-01
+        address:
+          type: string
+          description: Address of the company representative.
+          example: 1111 Budapest, Kossuth Lajos utca 1-3.
+        taxNumber:
+          type: string
+          description: Tax number of the company representative.
+          # pattern: ^\d{8}-\d-\d{2}$
+          example: 12345678-1-42
+        mode:
+          $ref: '#/components/schemas/enum_representativeMode'
+        position:
+          type: string
+          description: Official position of the representative in the company.
+          example: CEO
+        naturalPerson:
+          type: boolean
+          description: Representative is a natural person
+          example: true
+
+    PersonaRole:
+      type: object
+      description: An object that represents a persona role. \
+        If the role is joint, the user ID (withUserId) of the joint user.
+      required:
+        - uuid
+        - roleId
+        - validFrom
+        - _createdAt
+        - _createdBy
+        - _updatedAt
+        - _updatedBy
+      additionalProperties: false
+      properties:
+        uuid:
+          $ref: '#/components/schemas/UUID'
+        roleId:
+          $ref: '#/components/schemas/UUIDReference'
+        validFrom:
+          title: Date of role valid from.
+          type: string
+          format: date-time
+          example: "2021-11-01T12:00:00Z"
+        validTo:
+          title: Date of role valid to.
+          type: string
+          format: date-time
+          example: "2021-11-01T12:00:00Z"
+        personaId:
+          $ref: '#/components/schemas/UUIDReference'
+        persona:
+          $ref: '#/components/schemas/Persona'
+        _createdAt:
+          type: string
+          format: date-time
+          readOnly: true
+          description: Creation timestamp of the entity.
+          example: "2023-08-14T18:07:59.502555Z"
+        _createdBy:
+          type: string
+          format: uuid
+          readOnly: true
+          description: ID of the user who created the entity.
+          example: "00000000-0000-0000-0000-000000000000"
+        _updatedAt:
+          type: string
+          format: date-time
+          readOnly: true
+          description: Update timestamp of the entity.
+          example: "2023-08-14T18:07:59.502555Z"
+        _updatedBy:
+          type: string
+          format: uuid
+          readOnly: true
+          description: ID of the user who updated the entity.
+          example: "00000000-0000-0000-0000-000000000000"
+
+    PersonaRoleCreate:
+      type: object
+      description: Create a new PersonaRole.
+      required:
+        - roleId
+        - validFrom
+      additionalProperties: false
+      properties:
+        uuid:
+          $ref: '#/components/schemas/UUID'
+        roleId:
+          $ref: '#/components/schemas/UUIDReference'
+        validFrom:
+          title: Date of a role valid from.
+          type: string
+          format: date-time
+          example: "2021-11-01T12:00:00Z"
+        validTo:
+          title: Date of a role valid to.
+          type: string
+          format: date-time
+          example: "2021-11-01T12:00:00Z"
+        personaId:
+          # Another involved personaId
+          $ref: '#/components/schemas/UUIDReference'
+    PersonaRoleUpdate:
+      type: object
+      description: Update PersonaRole.
+      additionalProperties: false
+      properties:
+        validTo:
+          title: Date of a role valid to.
+          type: string
+          format: date-time
+          example: "2021-11-01T12:00:00Z"
+    PersonaRoles:
+      type: array
+      items:
+        $ref: '#/components/schemas/PersonaRole'
+    PersonaRolesCreate:
+      type: array
+      items:
+        $ref: '#/components/schemas/PersonaRoleCreate'
+
+    Role:
+      type: object
+      description: An object that represents a role.
+      required:
+        - uuid
+        - name
+        - description
+        - requiresCollaboration
+        - _createdAt
+        - _createdBy
+        - _updatedAt
+        - _updatedBy
+      additionalProperties: false
+      properties:
+        uuid:
+          $ref: '#/components/schemas/UUID'
+        name:
+          type: string
+          title: name of the role (code)
+          example: soleRepresentative
+        description:
+          type: string
+          title: description for role
+          example: Sole representative...
+        requiresCollaboration:
+          title: Is role joint with another user?
+          type: boolean
+          example: true
+        _createdAt:
+          type: string
+          format: date-time
+          readOnly: true
+          description: Creation timestamp of the entity.
+          example: "2023-08-14T18:07:59.502555Z"
+        _createdBy:
+          type: string
+          format: uuid
+          readOnly: true
+          description: ID of the user who created the entity.
+          example: "00000000-0000-0000-0000-000000000000"
+        _updatedAt:
+          type: string
+          format: date-time
+          readOnly: true
+          description: Update timestamp of the entity.
+          example: "2023-08-14T18:07:59.502555Z"
+        _updatedBy:
+          type: string
+          format: uuid
+          readOnly: true
+          description: ID of the user who updated the entity.
+          example: "00000000-0000-0000-0000-000000000000"
+
+    RoleCreate:
+      type: object
+      description: Create Role object.
+      required:
+        - name
+        - description
+      additionalProperties: false
+      properties:
+        uuid:
+          $ref: '#/components/schemas/UUIDReference'
+        name:
+          type: string
+          title: name of the role (code)
+          example: soleRepresentative
+        description:
+          type: string
+          title: description for role
+          example: Sole representative...
+        requiresCollaboration:
+          title: Is role joint with another user?
+          type: boolean
+          example: false
+    RoleUpdate:
+      type: object
+      description: Update Role object.
+      additionalProperties: false
+      properties:
+        name:
+          type: string
+          title: name of the role (code)
+          example: soleRepresentative
+        description:
+          type: string
+          title: description for role
+          example: Sole representative...
+        requiresCollaboration:
+          title: Is role joint with another user?
+          type: boolean
+          example: false
+    Roles:
+      type: array
+      items:
+        $ref: '#/components/schemas/Role'
+
+    ScoringLimit:
+      type: object
+      description: An object that represents a scoring limit.
+      additionalProperties: false
+      required:
+        - uuid
+        - limitType
+        - count
+        - amount
+        - currency
+        - _createdAt
+        - _createdBy
+        - _updatedAt
+        - _updatedBy
+      properties:
+        uuid:
+          $ref: '#/components/schemas/UUIDReference'
+        limitType:
+          $ref: '#/components/schemas/enum_scoringLimitType'
+        count:
+          description: Count of the limit.
+          type: integer
+          minimum: 0
+        amount:
+          description: Amount of money. For low-risk users with unrestricted transactions, the amount should be a very big number e.g. 999999999999999999.
+          type: number
+          minimum: 0
+          maximum: 999999999999999999
+        currency:
+          $ref: '#/components/schemas/Currency'
+        _createdAt:
+          type: string
+          format: date-time
+          readOnly: true
+          description: Creation timestamp of the entity.
+          example: "2023-08-14T18:07:59.502555Z"
+        _createdBy:
+          type: string
+          format: uuid
+          readOnly: true
+          description: ID of the user who created the entity.
+          example: "00000000-0000-0000-0000-000000000000"
+        _updatedAt:
+          type: string
+          format: date-time
+          readOnly: true
+          description: Update timestamp of the entity.
+          example: "2023-08-14T18:07:59.502555Z"
+        _updatedBy:
+          type: string
+          format: uuid
+          readOnly: true
+          description: ID of the user who updated the entity.
+          example: "00000000-0000-0000-0000-000000000000"
+    ScoringLimitsCreate:
+      type: array
+      description: |
+        An array of scoring limits. Each scoring limit should have a unique limitType.
+      items:
+        $ref: '#/components/schemas/ScoringLimitCreate'
+    ScoringLimitCreate:
+      type: object
+      description: An object that represents a scoring limit.
+      additionalProperties: false
+      required:
+        - limitType
+        - count
+        - amount
+        - currency
+      properties:
+        uuid:
+          $ref: '#/components/schemas/UUIDReference'
+        limitType:
+          $ref: '#/components/schemas/enum_scoringLimitType'
+        count:
+          description: Count of the limit.
+          type: integer
+          minimum: 0
+        amount:
+          description: Amount of money. For low-risk users with unrestricted transactions, the amount should be a very big number e.g. 999999999999999999.
+          type: number
+          minimum: 0
+          maximum: 999999999999999999
+        currency:
+          $ref: '#/components/schemas/Currency'
+    ScoringLimitUpdate:
+      type: object
+      description: An object that represents a scoring limit.
+      additionalProperties: false
+      required:
+        - limitType
+        - count
+        - amount
+        - currency
+      properties:
+        limitType:
+          $ref: '#/components/schemas/enum_scoringLimitType'
+        count:
+          description: Count of the limit.
+          type: integer
+          minimum: 0
+        amount:
+          description: Amount of money. For low-risk users with unrestricted transactions, the amount should be a very big number e.g. 999999999999999999.
+          type: number
+          minimum: 0
+          maximum: 999999999999999999
+        currency:
+          $ref: '#/components/schemas/Currency'
+
+    ScoringLimits:
+      type: array
+      description: |
+        An array of scoring limits. Each scoring limit should have a unique limitType.
+      items:
+        $ref: '#/components/schemas/ScoringLimit'
+
+    SubscriptionPackage:
+      type: object
+      description: An object that represents a customer.
+      required:
+        - uuid
+        - name
+        - code
+        - transactionAmountPercentage
+        - transactionalAmountFeeMinimum
+        - transactionalAmountFeeMaximum
+        - transactionalAmountFeeFix
+        - monthlyFee
+        - _createdAt
+        - _createdBy
+        - _updatedAt
+        - _updatedBy
+      additionalProperties: false
+      properties:
+        uuid:
+          $ref: '#/components/schemas/UUID'
+        name:
+          type: string
+          description: Public name of the package.
+          example: Basic
+        code:
+          type: string
+          description: Internal code of the package.
+          example: BASIC
+        transactionAmountPercentage:
+          type: number
+          description: Percentage of the transaction amount that is charged.
+          example: 0.5
+        transactionalAmountFeeMinimum:
+          # Minimum fee that is charged for a transaction.
+          $ref: '#/components/schemas/MoneyAmount'
+        transactionalAmountFeeMaximum:
+          # Maximum fee that is charged for a transaction.
+          $ref: '#/components/schemas/MoneyAmount'
+        transactionalAmountFeeFix:
+          # Fix fee that is charged for a transaction.
+          $ref: '#/components/schemas/MoneyAmount'
+        monthlyFee:
+          # Monthly fee that is charged for the subscription.
+          $ref: '#/components/schemas/MoneyAmount'
+        _createdAt:
+          type: string
+          format: date-time
+          readOnly: true
+          description: Creation timestamp of the entity.
+          example: "2023-08-14T18:07:59.502555Z"
+        _createdBy:
+          type: string
+          format: uuid
+          readOnly: true
+          description: ID of the user who created the entity.
+          example: "00000000-0000-0000-0000-000000000000"
+        _updatedAt:
+          type: string
+          format: date-time
+          readOnly: true
+          description: Update timestamp of the entity.
+          example: "2023-08-14T18:07:59.502555Z"
+        _updatedBy:
+          type: string
+          format: uuid
+          readOnly: true
+          description: ID of the user who updated the entity.
+          example: "00000000-0000-0000-0000-000000000000"
+
+    SubscriptionPackageCreate:
+      type: object
+      description: Create a new SubscriptionPackage.
+      required:
+        - name
+        - code
+        - transactionAmountPercentage
+        - transactionalAmountFeeMinimum
+        - transactionalAmountFeeMaximum
+        - transactionalAmountFeeFix
+        - monthlyFee
+      additionalProperties: false
+      properties:
+        uuid:
+          $ref: '#/components/schemas/UUIDReference'
+        name:
+          type: string
+          description: Public name of the package.
+          example: Basic
+        code:
+          type: string
+          description: Internal code of the package.
+          example: BASIC
+        transactionAmountPercentage:
+          type: number
+          description: Percentage of the transaction amount that is charged.
+          example: 0.5
+        transactionalAmountFeeMinimum:
+          # Minimum fee that is charged for a transaction.
+          $ref: '#/components/schemas/MoneyAmountCreate'
+        transactionalAmountFeeMaximum:
+          # Maximum fee that is charged for a transaction.
+          $ref: '#/components/schemas/MoneyAmountCreate'
+        transactionalAmountFeeFix:
+          # Fix fee that is charged for a transaction.
+          $ref: '#/components/schemas/MoneyAmountCreate'
+        monthlyFee:
+          # Monthly fee that is charged for the subscription.
+          $ref: '#/components/schemas/MoneyAmountCreate'
+    SubscriptionPackageUpdate:
+      type: object
+      description: Update SubscriptionPackage
+      additionalProperties: false
+      properties:
+        name:
+          type: string
+          description: Public name of the package.
+          example: Basic
+        code:
+          type: string
+          description: Internal code of the package.
+          example: BASIC
+        transactionAmountPercentage:
+          type: number
+          description: Percentage of the transaction amount that is charged.
+          example: 0.5
+    SubscriptionPackages:
+      type: array
+      items:
+        $ref: '#/components/schemas/SubscriptionPackage'
+
+    PepCreate:
+      type: object
+      required:
+        - type
+        - relative
+        - relationship
+      additionalProperties: false
+      properties:
+        type:
+          $ref: '#/components/schemas/enum_pep_type'
+        relative:
+          $ref: '#/components/schemas/enum_relative'
+        relationship:
+          $ref: '#/components/schemas/enum_relationship'
+    PepUpdate:
+      type: object
+      required:
+        - type
+        - relative
+        - relationship
+      additionalProperties: false
+      properties:
+        type:
+          $ref: '#/components/schemas/enum_pep_type'
+        relative:
+          $ref: '#/components/schemas/enum_relative'
+        relationship:
+          $ref: '#/components/schemas/enum_relationship'
+    Pep:
+      type: object
+      required:
+        - type
+        - relative
+        - relationship
+      additionalProperties: false
+      properties:
+        type:
+          $ref: '#/components/schemas/enum_pep_type'
+        relative:
+          $ref: '#/components/schemas/enum_relative'
+        relationship:
+          $ref: '#/components/schemas/enum_relationship'
+        _createdAt:
+          type: string
+          format: date-time
+          readOnly: true
+          description: Creation timestamp of the entity.
+          example: "2023-08-14T18:07:59.502555Z"
+        _createdBy:
+          type: string
+          format: uuid
+          readOnly: true
+          description: ID of the user who created the entity.
+          example: "00000000-0000-0000-0000-000000000000"
+        _updatedAt:
+          type: string
+          format: date-time
+          readOnly: true
+          description: Update timestamp of the entity.
+          example: "2023-08-14T18:07:59.502555Z"
+        _updatedBy:
+          type: string
+          format: uuid
+          readOnly: true
+          description: ID of the user who updated the entity.
+          example: "00000000-0000-0000-0000-000000000000"
+
+    User:
+      type: object
+      description: An object that represents a registered user.
+      required:
+        - uuid
+        - firstName
+        - lastName
+        - dateOfBirth
+        - placeOfBirth
+        - mothersMaidenName
+        - address
+        - status
+        - lastStatusChange
+        - registeredAt
+        - identityDocuments
+        - nationality
+        - kycMethod
+        - lastKYC
+        - _createdAt
+        - _createdBy
+        - _updatedAt
+        - _updatedBy
+      additionalProperties: false
+      title: User
+      properties:
+        uuid:
+          $ref: '#/components/schemas/UUID'
+        firstName:
+          type: string
+          description: First name(s) of the user.
+          example: John
+        lastName:
+          type: string
+          description: Last name of the user.
+          example: Doe
+        birthName:
+          type: string
+          description: Birth name(s) of the user
+          example: John Doe
+        dateOfBirth:
+          type: string
+          description: Date of birth.
+          format: date
+          example: 1990-01-01
+        placeOfBirth:
+          type: string
+          description: Place of birth.
+          example: Budapest
+        mothersMaidenName:
+          type: string
+          description: The maiden name of the user's mother.
+          example: Doe
+        address:
+          type: string
+          description: Official address, as stated on the address card.
+          example: 1111 Budapest, Kossuth Lajos utca 1.
+        temporaryAddress:
+          type: string
+          description: Temporary address, as stated on the address card.
+          example: 1111 Budapest, Kossuth Lajos utca 2.
+        status:
+          $ref: '#/components/schemas/enum_userStatus'
+        lastStatusChange:
+          type: string
+          description: Date of the last status change.
+          format: date-time
+          example: 2019-01-01T00:00:00Z
+        registeredAt:
+          type: string
+          description: Date of registration.
+          format: date-time
+          example: 2019-01-01T00:00:00Z
+        identityDocuments:
+          description: List of identity documents that the user currently has.
+          oneOf:
+            - $ref: '#/components/schemas/ListOfUUIDs'
+            - $ref: '#/components/schemas/IdentityDocuments'
+        nationality:
+          type: string
+          description: Nationality ([ISO 3166 code](https://en.wikipedia.org/wiki/ISO_3166-1_alpha-3)) of the user.
+          pattern: ^[A-Z]{3}$
+          example: HUN
+        kycMethod:
+          $ref: '#/components/schemas/enum_kycMethod'
+        lastKYC:
+          type: string
+          description: Date of the latest KYC check
+          format: date-time
+          example: 2019-01-01T00:00:00Z
+        diPocketClientId:
+          type: string
+          description: Client (User) ID in DiPocket
+          example: "12345678"
+        temporaryUserId:
+          type: string
+          description: Temporary user ID - for ForgeRock join two users
+          example: 827e22b8-de1b-47cc-9381-4f08a3bac1a3
+        personas:
+          readOnly: true
+          description: List of persona objects or uuids associated with the user.
+          oneOf:
+            - $ref: '#/components/schemas/ListOfUUIDs'
+            - $ref: '#/components/schemas/Personas'
+        devices:
+          readOnly: true
+          description: List of device objects or uuids associated with the user.
+          oneOf:
+            - $ref: '#/components/schemas/ListOfUUIDs'
+            - $ref: '#/components/schemas/Devices'
+        shortId:
+          type: string
+          description: Short ID of the user.
+          minLength: 8
+          maxLength: 8
+          example: "12345678"
+        acsIdentity:
+          type: string
+          description: Azure Communication Services identity of the user.
+          minLength: 42
+          example: "8:acs:2dee53b4-368b-45b4-ab52-8493fb117652_00000005-14a2-493b-8a72-5a3a0d000081"
+        pep:
+          oneOf:
+            - $ref: '#/components/schemas/UUID'
+            - $ref: '#/components/schemas/Pep'
+        _createdAt:
+          type: string
+          format: date-time
+          readOnly: true
+          description: Creation timestamp of the entity.
+          example: "2023-08-14T18:07:59.502555Z"
+        _createdBy:
+          type: string
+          format: uuid
+          readOnly: true
+          description: ID of the user who created the entity.
+          example: "00000000-0000-0000-0000-000000000000"
+        _updatedAt:
+          type: string
+          format: date-time
+          readOnly: true
+          description: Update timestamp of the entity.
+          example: "2023-08-14T18:07:59.502555Z"
+        _updatedBy:
+          type: string
+          format: uuid
+          readOnly: true
+          description: ID of the user who updated the entity.
+          example: "00000000-0000-0000-0000-000000000000"
+
+    UserCreate:
+      type: object
+      description: Create a new user.
+      required:
+        - firstName
+        - lastName
+        - dateOfBirth
+        - placeOfBirth
+        - mothersMaidenName
+        - address
+        - status
+        - lastStatusChange
+        - registeredAt
+        - identityDocuments
+        - nationality
+        - kycMethod
+        - lastKYC
+      additionalProperties: false
+      title: User
+      properties:
+        uuid:
+          $ref: '#/components/schemas/UUIDReference'
+        firstName:
+          type: string
+          description: First name(s) of the user.
+          example: John
+        lastName:
+          type: string
+          description: Last name of the user.
+          example: Doe
+        birthName:
+          type: string
+          description: Birth name(s) of the user
+          example: John Doe
+        dateOfBirth:
+          type: string
+          description: Date of birth.
+          format: date
+          example: 1990-01-01
+        placeOfBirth:
+          type: string
+          description: Place of birth.
+          example: Budapest
+        mothersMaidenName:
+          description: The maiden name of the user's mother.
+          type: string
+          example: Doe
+        address:
+          type: string
+          description: Official address, as stated on the address card.
+          example: 1111 Budapest, Kossuth Lajos utca 1.
+        temporaryAddress:
+          type: string
+          description: Temporary address, as stated on the address card.
+          example: 1111 Budapest, Kossuth Lajos utca 2.
+        status:
+          $ref: '#/components/schemas/enum_userStatus'
+        lastStatusChange:
+          type: string
+          description: Date of the last status change.
+          format: date-time
+          example: 2019-01-01T00:00:00Z
+        registeredAt:
+          type: string
+          description: Date of registration.
+          format: date-time
+          example: 2019-01-01T00:00:00Z
+        identityDocuments:
+          type: array
+          description: List of identity documents that the user currently has.
+          items:
+            $ref: '#/components/schemas/IdentityDocumentCreate'
+        nationality:
+          type: string
+          description: Nationality ([ISO 3166 code](https://en.wikipedia.org/wiki/ISO_3166-1_alpha-3)) of the user.
+          pattern: ^[A-Z]{3}$
+          example: HUN
+        kycMethod:
+          $ref: '#/components/schemas/enum_kycMethod'
+        lastKYC:
+          type: string
+          description: Date of the latest KYC check
+          format: date-time
+          example: 2019-01-01T00:00:00Z
+        diPocketClientId:
+          type: string
+          description: Client (User) ID in DiPocket
+          example: "12345678"
+        shortId:
+          type: string
+          description: Short ID of the user.
+          minLength: 8
+          maxLength: 8
+          example: "12345678"
+        acsIdentity:
+          type: string
+          description: Azure Communication Services identity of the user.
+          minLength: 42
+          example: "8:acs:2dee53b4-368b-45b4-ab52-8493fb117652_00000005-14a2-493b-8a72-5a3a0d000081"
+        pep:
+          type: object
+          required:
+            - type
+            - relative
+            - relationship
+          additionalProperties: false
+          properties:
+            type:
+              $ref: '#/components/schemas/enum_pep_type'
+            relative:
+              $ref: '#/components/schemas/enum_relative'
+            relationship:
+              $ref: '#/components/schemas/enum_relationship'
+    UserUpdate:
+      type: object
+      description: Update a user.
+      additionalProperties: false
+      title: User
+      properties:
+        uuid:
+          $ref: '#/components/schemas/UUIDReference'
+        firstName:
+          type: string
+          description: First name(s) of the user.
+          example: John
+        lastName:
+          type: string
+          description: Last name of the user.
+          example: Doe
+        birthName:
+          type: string
+          description: Birth name(s) of the user
+          example: John Doe
+        dateOfBirth:
+          type: string
+          description: Date of birth.
+          format: date
+          example: 1990-01-01
+        placeOfBirth:
+          type: string
+          description: Place of birth.
+          example: Budapest
+        mothersMaidenName:
+          type: string
+          example: Doe
+        address:
+          type: string
+          description: Official address, as stated on the address card.
+          example: 1111 Budapest, Kossuth Lajos utca 1.
+        temporaryAddress:
+          type: string
+          description: Temporary address, as stated on the address card.
+          example: 1111 Budapest, Kossuth Lajos utca 2.
+        status:
+          $ref: '#/components/schemas/enum_userStatus'
+        lastStatusChange:
+          type: string
+          description: Date of the last status change.
+          format: date-time
+          example: 2019-01-01T00:00:00Z
+        registeredAt:
+          type: string
+          description: Date of registration.
+          format: date-time
+          example: 2019-01-01T00:00:00Z
+        nationality:
+          type: string
+          description: Nationality ([ISO 3166 code](https://en.wikipedia.org/wiki/ISO_3166-1_alpha-3)) of the user.
+          pattern: ^[A-Z]{3}$
+          example: HUN
+        kycMethod:
+          $ref: '#/components/schemas/enum_kycMethod'
+        lastKYC:
+          type: string
+          description: Date of the latest KYC check
+          format: date-time
+          example: 2019-01-01T00:00:00Z
+        diPocketClientId:
+          type: string
+          description: Client (User) ID in DiPocket
+          example: "12345678"
+        temporaryUserId:
+          type: string
+          description: Temporary user ID - for ForgeRock join two users
+          example: "00ee4a87-a20c-4a9c-a4c8-4c833cda2d80"
+        shortId:
+          type: string
+          description: Short ID of the user.
+          minLength: 8
+          maxLength: 8
+          example: "12345678"
+        acsIdentity:
+          type: string
+          description: Azure Communication Services identity of the user.
+          minLength: 42
+          example: "8:acs:2dee53b4-368b-45b4-ab52-8493fb117652_00000005-14a2-493b-8a72-5a3a0d000081"
+    Users:
+      type: array
+      items:
+        $ref: '#/components/schemas/User'
+
+    UUID:
+      type: string
+      format: uuid
+      description: An identifier that uniquely identifies the object.
+      readOnly: true
+      example: "3a0151f5-a8d2-4a3d-a15e-bd77ea3050b2"
+    UUIDReference:
+      type: string
+      format: uuid
+      description: An identifier that uniquely identifies the object.
+      example: "3a0151f5-a8d2-4a3d-a15e-bd77ea3050b2"
+
+  responses:
+    Problem404:
+      description: unexpected error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Problem'
+    Problem:
+      description: unexpected error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Problem'
+    ObjectCreated:
+      description: Object created
+      content:
+        text/plain:
+          schema:
+            $ref: '#/components/schemas/UUID'
+    Account:
+      description: Account object
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Account'
+    Accounts:
+      description: List of accounts
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Accounts'
+    Card:
+      description: Card object
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Card'
+    Cards:
+      description: List of cards
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Cards'
+        
+    CardLimit:
+      description: Card limit
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/CardLimit'
+         
+    CardLimits:
+      description: List of cards' limits
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/CardLimits'
+        
+    Customer:
+      description: Customer object
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Customer'
+         
+    Customers:
+      description: List of customers
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Customers'
+         
+    Declarations:
+      description: Declarations object
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/DeclarationsState'
+          
+    DeclarationsList:
+      description: List of Declarations
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/DeclarationsStates'
+          
+    Device:
+      description: Device object
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Device'
+         
+    Devices:
+      description: List of Devices
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Devices'
+  
+    Invitation:
+      description: Invitation object
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Invitation'
+          
+    Invitations:
+      description: List of Invitations
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Invitations'
+         
+    MoneyAmount:
+      description: Amount object
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/MoneyAmount'
+      
+    Partner:
+      description: Partner object.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Partner'
+        
+    Partners:
+      description: List of Partners
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Partners'
+          
+    Pep:
+      description: Pep object.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Pep'
+         
+    Persona:
+      description: Persona object.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Persona'
+            
+    Personas:
+      description: List of Personas
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Personas'
+          
+    PersonaRole:
+      description: PersonaRole object.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/PersonaRole'
+    PersonaRoles:
+      description: List of PersonaRoles
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/PersonaRoles'
+    Role:
+      description: Role object.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Role'
+        
+    Roles:
+      description: List of Roles
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Roles'
+    ScoringLimit:
+      description: Scoring limit
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ScoringLimit'
+          
+    ScoringLimits:
+      description: List of scorings' limits
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ScoringLimits'
+    SubscriptionPackage:
+      description: Subscription package object.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/SubscriptionPackage'
+          
+    SubscriptionPackages:
+      description: List of subscription packages
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/SubscriptionPackages'
+          
+    User:
+      description: User object.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/User'
+          
+    Users:
+      description: List of Users
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Users'
+        
+
+  requestBodies:
+    AccountCreate:
+      description: Add Account into a customer.
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/AccountCreate'
+       
+    AccountUpdate:
+      description: Modify Account.
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/AccountUpdate'
+          
+    CardCreate:
+      description: Create a card.
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/CardCreate'
+         
+    CardUpdate:
+      description: Update a card.
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/CardUpdate'
+         
+    CardLimitCreate:
+      description: Create a new card limit for Card.
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/CardLimitCreate'
+          
+    CardLimitUpdate:
+      description: Update a card limit.
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/CardLimitUpdate'
+        
+    CustomerCreate:
+      description: Create a customer.
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/CustomerCreate'
+          
+    CustomerUpdate:
+      description: Update a customer.
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/CustomerUpdate'
+        
+    DeviceCreate:
+      description: Create a device.
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/DeviceCreate'
+        
+    DeviceUpdate:
+      description: Update Device's top level properties.
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/DeviceUpdate'
+          
+    InvitationCreate:
+      description: Create an invitation.
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/InvitationCreate'
+          
+    InvitationUpdate:
+      description: Update an invitation.
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/InvitationUpdate'
+        
+    LoginSuccess:
+      description: Update device with login success.
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/LoginSuccess'
+       
+    MoneyAmountUpdate:
+      description: Modify Amount.
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/MoneyAmountUpdate'
+          
+    PartnerCreate:
+      description: Create Partner for Customer.
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/PartnerCreate'
+         
+    PartnerUpdate:
+      description: Update Partner.
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/PartnerUpdate'
+         
+    PepCreate:
+      description: Create a Pep.
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/PepCreate'
+         
+    PepUpdate:
+      description: Pep update.
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/PepUpdate'
+      
+    PersonaCreate:
+      description: Create a persona.
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/PersonaCreate'
+          
+    PersonaUpdate:
+      description: Persona update.
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/PersonaUpdate'
+        
+    PersonaRoleCreate:
+      description: Add new role to a persona.
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/PersonaRoleCreate'
+        
+    DeclarationsStateCreate:
+      description: Create a new declaration state.
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/DeclarationsStateCreate'
+         
+    DeclarationsStateUpdate:
+      description: Update a declaration state.
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/DeclarationsStateUpdate'
+         
+    PersonaRoleUpdate:
+      description: Modify PersonaRole.
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/PersonaRoleUpdate'
+         
+    RoleCreate:
+      description: Create a role.
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/RoleCreate'
+         
+    RoleUpdate:
+      description: Update a Role.
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/RoleUpdate'
+          
+    ScoringLimitCreate:
+      description: Create a new scoring limit.
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ScoringLimitCreate'
+          
+    ScoringLimitUpdate:
+      description: Update a scoring limit.
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ScoringLimitUpdate'
+        
+            
+    SubscriptionPackageCreate:
+      description: Create a subscription package.
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/SubscriptionPackageCreate'
+         
+    SubscriptionPackageUpdate:
+      description: Update a subscription package.
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/SubscriptionPackageUpdate'
+        
+    UserCreate:
+      description: Create a user.
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/UserCreate'
+         
+    UserUpdate:
+      description: Update a user.
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/UserUpdate'
+       
+
+
+  parameters:
+    accountId:
+      name: accountId
+      description: The account id
+      in: path
+      required: true
+      schema:
+        $ref: '#/components/schemas/UUID'
+    amountId:
+      name: amountId
+      description: The amount id
+      in: path
+      required: true
+      schema:
+        $ref: '#/components/schemas/UUID'
+    cardId:
+      name: cardId
+      description: The card id
+      in: path
+      required: true
+      schema:
+        $ref: '#/components/schemas/UUID'
+    cardLimitId:
+      name: cardLimitId
+      description: The cardLimit id
+      in: path
+      required: true
+      schema:
+        $ref: '#/components/schemas/UUID'
+    customerId:
+      name: customerId
+      description: The customer id
+      in: path
+      required: true
+      schema:
+        $ref: '#/components/schemas/UUID'
+    declarationsId:
+      name: declarationsId
+      description: The declarations id
+      in: path
+      required: true
+      schema:
+        $ref: '#/components/schemas/UUID'
+    deviceId:
+      name: deviceId
+      description: The device id
+      in: path
+      required: true
+      schema:
+        $ref: '#/components/schemas/UUID'
+    iban:
+      name: iban
+      description: The account's iban.
+      in: path
+      required: true
+      schema:
+        $ref: '#/components/schemas/IBAN'
+    invitationId:
+      name: invitationId
+      description: The invitation id
+      in: path
+      required: true
+      schema:
+        $ref: '#/components/schemas/UUID'
+    partnerId:
+      name: partnerId
+      description: The Partner ID
+      in: path
+      required: true
+      schema:
+        $ref: '#/components/schemas/UUID'
+    pepId:
+      name: pepId
+      description: The Pep ID
+      in: path
+      required: true
+      schema:
+        $ref: '#/components/schemas/UUID'
+    personaId:
+      name: personaId
+      description: The persona id
+      in: path
+      required: true
+      schema:
+        $ref: '#/components/schemas/UUID'
+    personaRoleId:
+      name: personaRoleId
+      description: The personaRole id
+      in: path
+      required: true
+      schema:
+        $ref: '#/components/schemas/UUID'
+    roleId:
+      name: roleId
+      description: The role id
+      in: path
+      required: true
+      schema:
+        $ref: '#/components/schemas/UUID'
+    scoringLimitId:
+      name: scoringLimitId
+      description: The scoringLimit id
+      in: path
+      required: true
+      schema:
+        $ref: '#/components/schemas/UUID'
+    subscriptionPackageId:
+      name: subscriptionPackageId
+      description: The subscription package id
+      in: path
+      required: true
+      schema:
+        $ref: '#/components/schemas/UUID'
+    userId:
+      name: userId
+      description: The user id
+      in: path
+      required: true
+      schema:
+        $ref: '#/components/schemas/UUID'

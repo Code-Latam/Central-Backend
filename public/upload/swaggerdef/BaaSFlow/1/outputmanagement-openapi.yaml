@@ -1,0 +1,320 @@
+openapi: 3.0.1
+info:
+  title: Output Management
+  version: 2023.10.3.0.5
+  contact:
+    name: BaaSFlow
+    email: info@baasflow.com
+    url: 'https://baasflow.com'
+  license:
+    name: Apache 2.0
+    url: 'https://www.apache.org/licenses/LICENSE-2.0.html'
+servers:
+  - url: http://localhost:8080
+    description: Generated server url
+paths:
+  /document:
+    post:
+      tags:
+        - generate-report-rest-controller
+      summary: "Accept document generation request. The document will be generated asynchronously, and the response will contain an ID that can be used to retrieve the document."
+      operationId: generateDocument
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GenerateDocumentRequest'
+        required: true
+      responses:
+        "201":
+          description: Created
+          content:
+            '*/*':
+              schema:
+                type: string
+        "202":
+          description: The Engine delivers the GUID for this request that will be
+            processed asynchronously.
+          content:
+            '*/*':
+              schema:
+                type: string
+        "500":
+          description: An error occurred while processed the request.
+          content:
+            '*/*':
+              schema:
+                type: string
+        "400":
+          description: Wrong format of the request. Constraint violation.
+          content:
+            '*/*':
+              schema:
+                type: string
+        "404":
+          description: Template not found.
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: string
+  /templates/reload:
+    get:
+      tags:
+        - generate-report-rest-controller
+      description: Get the status of a document generation request.
+      operationId: reloadTemplates
+      responses:
+        "201":
+          description: If the output generation has not yet started.
+          content:
+            '*/*':
+              schema:
+                type: string
+        "202":
+          description: If the output generation is still in progress.
+          content:
+            '*/*':
+              schema:
+                type: string
+        "500":
+          description: An error occurred while generating the output.
+          content:
+            '*/*':
+              schema:
+                type: string
+        "400":
+          description: Bad Request
+          content:
+            '*/*':
+              schema:
+                type: string
+        "404":
+          description: The requested output does not exist.
+          content:
+            '*/*':
+              schema:
+                type: string
+        "302":
+          description: The output is ready.
+          content:
+            '*/*':
+              schema:
+                type: string
+                format: binary
+  /document/{id}/status:
+    get:
+      tags:
+        - generate-report-rest-controller
+      description: Get the status of a document generation request.
+      operationId: getStatus
+      parameters:
+        - name: id
+          in: path
+          description: ID of the document
+          required: true
+          schema:
+            type: string
+      responses:
+        "201":
+          description: If the output generation has not yet started.
+          content:
+            '*/*':
+              schema:
+                type: string
+        "202":
+          description: If the output generation is still in progress.
+          content:
+            '*/*':
+              schema:
+                type: string
+        "500":
+          description: An error occurred while generating the output.
+          content:
+            '*/*':
+              schema:
+                type: string
+        "400":
+          description: Bad Request
+          content:
+            '*/*':
+              schema:
+                type: string
+        "404":
+          description: The requested output does not exist.
+          content:
+            '*/*':
+              schema:
+                type: string
+        "302":
+          description: The output is ready.
+          content:
+            '*/*':
+              schema:
+                type: string
+                format: binary
+  /document/{id}/file:
+    get:
+      tags:
+        - generate-report-rest-controller
+      description: Retrieve the generated document.
+      operationId: getDocument
+      parameters:
+        - name: id
+          in: path
+          description: ID of the document
+          required: true
+          schema:
+            type: string
+      responses:
+        "201":
+          description: If the output generation has not yet started.
+          content:
+            '*/*':
+              schema:
+                type: string
+        "202":
+          description: If the output generation is still in progress.
+          content:
+            '*/*':
+              schema:
+                type: string
+        "500":
+          description: An error occurred while generating the output.
+          content:
+            '*/*':
+              schema:
+                type: string
+        "400":
+          description: Bad Request
+          content:
+            '*/*':
+              schema:
+                type: string
+        "404":
+          description: The requested output does not exist.
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: The Engine delivers the generated report as a file stream.
+          content:
+            '*/*':
+              schema:
+                type: string
+                format: binary
+components:
+  schemas:
+    GenerateDocumentRequest:
+      description: Request to generate a document.
+      required:
+        - data
+        - destination
+        - template
+      type: object
+      properties:
+        template:
+          $ref: '#/components/schemas/Template'
+        destination:
+          type: string
+          description: |
+            Destination can be a following values depending on the output format: filename, phone number, email address.
+            filename: When user will download the file this filename will be used.
+            phone number: This phone number will be used to send the document via SMS.
+            email address: This email address will be used to send the document via email.
+          example: something@email.com
+        data:
+          $ref: '#/components/schemas/JsonNode'
+        metadata:
+          type: object
+          additionalProperties:
+            type: string
+            description: |
+              Metadata stored with the document in S3 and not within the document. e.g. accountNumber, customerNumber, etc.
+              Output Management application will store some metadata (e.g. Template ID, Page count, Destination), where the names beginning with "om-".
+              Size is limited! You can find more information here: https://docs.aws.amazon.com/AmazonS3/latest/userguide/UsingMetadata.html#UserMetadata
+            example: "{\"accountNumber\":\"123456789\",\"customerNumber\":\"987654321\"\
+              }"
+          description: |
+            Metadata stored with the document in S3 and not within the document. e.g. accountNumber, customerNumber, etc.
+            Output Management application will store some metadata (e.g. Template ID, Page count, Destination), where the names beginning with "om-".
+            Size is limited! You can find more information here: https://docs.aws.amazon.com/AmazonS3/latest/userguide/UsingMetadata.html#UserMetadata
+          example:
+            accountNumber: "123456789"
+            customerNumber: "987654321"
+        attachments:
+          type: array
+          description: "Attachments which will be added to the PDF document. If the channel does not support attachment, they will be ignored."
+          items:
+            $ref: '#/components/schemas/PDFAttachment'
+        sign:
+          type: boolean
+          description: "If true, the document will be signed with the configured certificate."
+          example: true
+        timestamp:
+          type: boolean
+          description: "If true, the document will be timestamped with the configured timestamp server."
+          example: true
+    JsonNode:
+      type: object
+      description: Data for template in JSON format. This content depends on the template.
+      example:
+        name: Muhammad
+        surname: Wong
+        age: 42
+    PDFAttachment:
+      required:
+        - content
+        - filename
+        - mimeType
+      type: object
+      properties:
+        filename:
+          type: string
+          description: Filename of the attachment.
+          example: signedcontent.json
+        description:
+          type: string
+          description: Description of the attachment.
+          example: Customer signed request
+        mimeType:
+          type: string
+          description: MIME type of the attachment.
+          example: application/json
+        content:
+          type: array
+          description: Content of the attachment.
+          example: eyJkYXRhIjogeyJuYW1lIjogIkpvaG4iLCJzdXJuYW1lIjogIkRvZSIsImFnZSI6IDQyfX0=
+          items:
+            type: string
+            description: Content of the attachment.
+            format: byte
+            example: ZXlKa1lYUmhJam9nZXlKdVlXMWxJam9nSWtwdmFHNGlMQ0p6ZFhKdVlXMWxJam9nSWtSdlpTSXNJbUZuWlNJNklEUXlmWDA9
+      description: PDF attachment.
+    Template:
+      required:
+        - locale
+        - name
+      type: object
+      properties:
+        name:
+          maxLength: 36
+          minLength: 2
+          type: string
+          description: Name of the template.
+          example: otp-sms
+        locale:
+          maxLength: 5
+          minLength: 2
+          type: string
+          description: Locale of the template.
+          example: hu-HU
+      description: |-
+        Template to use for generating the document.
+        Application will validate template is exists.

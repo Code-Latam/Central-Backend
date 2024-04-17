@@ -1,0 +1,1154 @@
+---
+swagger: "2.0"
+info:
+  version: "1.0"
+  title: Payment Hub APIs
+  contact: {}
+host: 'localhost:8080'
+basePath: //channel.openg2p.org/channel
+tags:
+- name: Account Management
+- name: Customer Management
+- name: Miscellaneous
+- name: Mojaloop APIs
+- name: Mobile Money APIs
+- name: Bulk APIs
+schemes:
+- http
+consumes:
+- application/json
+produces:
+- application/json
+paths:
+  /accounts/{IdentifierType}/{IdentifierId}/statemententries:
+    get:
+      tags:
+      - Account Management
+      summary: Account Statement by Identifier
+      operationId: AccountStatementbyIdentifier
+      produces:
+      - application/json
+      parameters:
+      - name: Authorization
+        in: header
+        required: false
+        type: string
+        default: "Bearer {token}"
+      - name: Platform-TenantId
+        in: header
+        description: ""
+        required: true
+        type: string
+      - name: IdentifierType
+        in: path
+        description: ""
+        required: true
+        type: string
+      - name: IdentifierId
+        in: path
+        description: ""
+        required: true
+        type: string
+      deprecated: false
+      responses:
+        "200":
+          description: ""
+          headers: {}
+  /accounts/{IdentifierType}/{IdentifierId}/balance:
+    get:
+      tags:
+      - Account Management
+      summary: Account Balance
+      operationId: AccountBalance
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      parameters:
+      - name: Authorization
+        in: header
+        required: false
+        type: string
+        default: "Bearer {token}"
+      - name: Platform-TenantId
+        in: header
+        description: ""
+        required: true
+        type: string
+      - name: Content-Type
+        in: header
+        description: ""
+        required: true
+        type: string
+      - name: IdentifierType
+        in: path
+        description: ""
+        required: true
+        type: string
+      - name: IdentifierId
+        in: path
+        description: ""
+        required: true
+        type: string
+      deprecated: false
+      responses:
+        "200":
+          description: ""
+          headers: {}
+  /accounts/{IdentifierType}/{IdentifierId}/status:
+    get:
+      tags:
+      - Account Management
+      summary: Account Status
+      operationId: AccountStatus
+      produces:
+      - application/json
+      parameters:
+      - name: Authorization
+        in: header
+        required: false
+        type: string
+        default: "Bearer {token}"
+      - name: Platform-TenantId
+        in: header
+        description: ""
+        required: true
+        type: string
+      - name: IdentifierType
+        in: path
+        description: ""
+        required: true
+        type: string
+      - name: IdentifierId
+        in: path
+        description: ""
+        required: true
+        type: string
+      deprecated: false
+      responses:
+        "200":
+          description: ""
+          headers: {}
+  /accounts/{IdentifierType}/{IdentifierId}/accountname:
+    get:
+      tags:
+      - Account Management
+      summary: Account Name
+      operationId: AccountName
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      parameters:
+      - name: Authorization
+        in: header
+        required: false
+        type: string
+        default: "Bearer {token}"
+      - name: Platform-TenantId
+        in: header
+        description: ""
+        required: true
+        type: string
+      - name: Content-Type
+        in: header
+        description: ""
+        required: true
+        type: string
+      - name: IdentifierType
+        in: path
+        description: ""
+        required: true
+        type: string
+      - name: IdentifierId
+        in: path
+        description: ""
+        required: true
+        type: string
+      deprecated: false
+      responses:
+        "200":
+          description: ""
+          headers: {}
+  /accounts/{IdentifierType}/{IdentifierId}/transactions:
+    get:
+      tags:
+      - Account Management
+      summary: Account Transactions
+      operationId: AccountTransactions
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      parameters:
+      - name: Authorization
+        in: header
+        required: false
+        type: string
+        default: "Bearer {token}"
+      - name: Platform-TenantId
+        in: header
+        description: ""
+        required: true
+        type: string
+      - name: Content-Type
+        in: header
+        description: ""
+        required: true
+        type: string
+      - name: IdentifierType
+        in: path
+        description: ""
+        required: true
+        type: string
+      - name: IdentifierId
+        in: path
+        description: ""
+        required: true
+        type: string
+      deprecated: false
+      responses:
+        "200":
+          description: ""
+          headers: {}
+  /deposit:
+    post:
+      tags:
+      - Account Management
+      summary: Deposit Money Copy
+      operationId: DepositMoneyCopy
+      produces:
+      - application/json
+      parameters:
+      - name: Authorization
+        in: header
+        required: false
+        type: string
+        default: "Bearer {token}"
+      - name: Platform-TenantId
+        in: header
+        description: ""
+        required: true
+        type: string
+      - in: body
+        name: Body
+        description: ""
+        required: true
+        schema:
+          $ref: '#/definitions/DepositMoneyCopyRequest'
+      deprecated: false
+      responses:
+        "200":
+          description: ""
+          headers: {}
+  /customers/{IdentifierType}/{IdentifierId}/cpin:
+    post:
+      tags:
+      - Customer Management
+      summary: Customer Set PIN
+      operationId: CustomerSetPIN
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      parameters:
+      - name: Authorization
+        in: header
+        required: false
+        type: string
+        default: "Bearer {token}"
+      - name: Platform-TenantId
+        in: header
+        description: ""
+        required: true
+        type: string
+      - name: Content-Type
+        in: header
+        description: ""
+        required: true
+        type: string
+      - in: body
+        name: Body
+        description: ""
+        required: true
+        schema:
+          $ref: '#/definitions/CustomerSetPINRequest'
+      - name: IdentifierType
+        in: path
+        description: ""
+        required: true
+        type: string
+      - name: IdentifierId
+        in: path
+        description: ""
+        required: true
+        type: string
+      deprecated: false
+      responses:
+        "200":
+          description: ""
+          headers: {}
+  /customers:
+    post:
+      tags:
+      - Customer Management
+      summary: Customer Creation
+      operationId: CustomerCreation
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      parameters:
+      - name: Authorization
+        in: header
+        required: false
+        type: string
+        default: "Bearer {token}"
+      - name: Platform-TenantId
+        in: header
+        description: ""
+        required: true
+        type: string
+      - name: Content-Type
+        in: header
+        description: ""
+        required: true
+        type: string
+      - in: body
+        name: Body
+        description: ""
+        required: true
+        schema:
+          $ref: '#/definitions/CustomerCreationRequest'
+      deprecated: false
+      responses:
+        "200":
+          description: ""
+          headers: {}
+  /heartbeat:
+    get:
+      tags:
+      - Miscellaneous
+      summary: Heartbeat
+      operationId: Heartbeat
+      produces:
+      - application/json
+      parameters:
+      - name: Authorization
+        in: header
+        required: false
+        type: string
+        default: "Bearer {token}"
+      deprecated: false
+      responses:
+        "200":
+          description: ""
+          headers: {}
+  /transfer/{transactionId}:
+    get:
+      tags:
+      - Mojaloop APIs
+      summary: Transfer Details
+      operationId: TransferDetails
+      produces:
+      - application/json
+      parameters:
+      - name: Authorization
+        in: header
+        required: false
+        type: string
+        default: "Bearer {token}"
+      - name: transactionId
+        in: path
+        description: ""
+        required: true
+        type: string
+      deprecated: false
+      responses:
+        "200":
+          description: ""
+          headers: {}
+  /transfer:
+    post:
+      tags:
+      - Mojaloop APIs
+      summary: Transfer
+      operationId: Transfer
+      produces:
+      - application/json
+      parameters:
+      - name: Authorization
+        in: header
+        required: false
+        type: string
+        default: "Bearer {token}"
+      - in: body
+        name: Body
+        description: ""
+        required: true
+        schema:
+          $ref: '#/definitions/TransferRequest'
+      deprecated: false
+      responses:
+        "200":
+          description: ""
+          headers: {}
+  /transactionRequest:
+    post:
+      tags:
+      - Mojaloop APIs
+      summary: Transfer Request
+      operationId: TransferRequest
+      produces:
+      - application/json
+      parameters:
+      - name: Authorization
+        in: header
+        required: false
+        type: string
+        default: "Bearer {token}"
+      - in: body
+        name: Body
+        description: ""
+        required: true
+        schema:
+          $ref: '#/definitions/TransferRequestRequest'
+      deprecated: false
+      responses:
+        "200":
+          description: ""
+          headers: {}
+  /partyRegistration:
+    post:
+      tags:
+      - Mojaloop APIs
+      summary: Party Registration
+      operationId: PartyRegistration
+      produces:
+      - application/json
+      parameters:
+      - name: Authorization
+        in: header
+        required: false
+        type: string
+        default: "Bearer {token}"
+      - in: body
+        name: Body
+        description: ""
+        required: true
+        schema:
+          $ref: '#/definitions/PartyRegistrationRequest'
+      deprecated: false
+      responses:
+        "200":
+          description: ""
+          headers: {}
+  /{provider}/transfer:
+    post:
+      tags:
+      - Mobile Money APIs
+      summary: Bilateral Money Transfer
+      operationId: BilateralMoneyTransfer
+      produces:
+      - application/json
+      parameters:
+      - name: Authorization
+        in: header
+        required: false
+        type: string
+        default: "Bearer {token}"
+      - name: Platform-TenantId
+        in: header
+        description: ""
+        required: true
+        type: string
+      - in: body
+        name: Body
+        description: ""
+        required: true
+        schema:
+          $ref: '#/definitions/BilateralMoneyTransferRequest'
+      - name: provider
+        in: path
+        description: ""
+        required: true
+        type: string
+      deprecated: false
+      responses:
+        "200":
+          description: ""
+          headers: {}
+  /{provider}/merchantpay:
+    post:
+      tags:
+      - Mobile Money APIs
+      summary: MerchantPay
+      operationId: MerchantPay
+      produces:
+      - application/json
+      parameters:
+      - name: Authorization
+        in: header
+        required: false
+        type: string
+        default: "Bearer {token}"
+      - name: Platform-TenantId
+        in: header
+        description: ""
+        required: true
+        type: string
+      - in: body
+        name: Body
+        description: ""
+        required: true
+        schema:
+          $ref: '#/definitions/MerchantPayRequest'
+      - name: provider
+        in: path
+        description: ""
+        required: true
+        type: string
+      deprecated: false
+      responses:
+        "200":
+          description: ""
+          headers: {}
+  /{provider}/merchantpay/authcode/{authorizationCode}:
+    post:
+      tags:
+      - Mobile Money APIs
+      summary: MerchantPay with AuthCode
+      operationId: MerchantPaywithAuthCode
+      produces:
+      - application/json
+      parameters:
+      - name: Authorization
+        in: header
+        required: false
+        type: string
+        default: "Bearer {token}"
+      - name: Platform-TenantId
+        in: header
+        description: ""
+        required: true
+        type: string
+      - in: body
+        name: Body
+        description: ""
+        required: true
+        schema:
+          $ref: '#/definitions/MerchantPaywithAuthCodeRequest'
+      - name: provider
+        in: path
+        description: ""
+        required: true
+        type: string
+      - name: authorizationCode
+        in: path
+        description: ""
+        required: true
+        type: string
+      deprecated: false
+      responses:
+        "200":
+          description: ""
+          headers: {}
+  /{provider}/inttransfer:
+    post:
+      tags:
+      - Mobile Money APIs
+      summary: International Transfer
+      operationId: InternationalTransfer
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      parameters:
+      - name: Authorization
+        in: header
+        required: false
+        type: string
+        default: "Bearer {token}"
+      - name: Platform-TenantId
+        in: header
+        description: ""
+        required: true
+        type: string
+      - name: Content-Type
+        in: header
+        description: ""
+        required: true
+        type: string
+      - in: body
+        name: Body
+        description: ""
+        required: true
+        schema:
+          $ref: '#/definitions/InternationalTransferRequest'
+      - name: provider
+        in: path
+        description: ""
+        required: true
+        type: string
+      deprecated: false
+      responses:
+        "200":
+          description: ""
+          headers: {}
+  /{provider}/deposit:
+    post:
+      tags:
+      - Mobile Money APIs
+      summary: Deposit Money
+      operationId: DepositMoney
+      produces:
+      - application/json
+      parameters:
+      - name: Authorization
+        in: header
+        required: false
+        type: string
+        default: "Bearer {token}"
+      - name: Platform-TenantId
+        in: header
+        description: ""
+        required: true
+        type: string
+      - in: body
+        name: Body
+        description: ""
+        required: true
+        schema:
+          $ref: '#/definitions/DepositMoneyRequest'
+      - name: provider
+        in: path
+        description: ""
+        required: true
+        type: string
+      deprecated: false
+      responses:
+        "200":
+          description: ""
+          headers: {}
+  /bulk/transfer:
+    post:
+      tags:
+      - Bulk APIs
+      summary: Bulk Transfer
+      operationId: BulkTransfer
+      consumes:
+      - application/x-www-form-urlencoded
+      produces:
+      - application/json
+      parameters:
+      - name: Authorization
+        in: header
+        required: false
+        type: string
+        default: "Bearer {token}"
+      - name: Platform-TenantId
+        in: header
+        description: ""
+        required: true
+        type: string
+      - name: data
+        in: formData
+        description: ""
+        required: true
+        type: string
+      - name: requestId
+        in: formData
+        description: ""
+        required: true
+        type: string
+      - name: purpose
+        in: formData
+        description: ""
+        required: true
+        type: string
+      deprecated: false
+      responses:
+        "200":
+          description: ""
+          headers: {}
+  /batch:
+    get:
+      tags:
+      - Bulk APIs
+      summary: Batch Summary
+      operationId: BatchSummary
+      produces:
+      - application/json
+      parameters:
+      - name: Authorization
+        in: header
+        required: false
+        type: string
+        default: "Bearer {token}"
+      - name: batchId
+        in: query
+        description: ""
+        required: true
+        type: string
+      - name: Platform-TenantId
+        in: header
+        description: ""
+        required: true
+        type: string
+      deprecated: false
+      responses:
+        "200":
+          description: ""
+          headers: {}
+  /batch/detail:
+    get:
+      tags:
+      - Bulk APIs
+      summary: Batch Details
+      operationId: BatchDetails
+      produces:
+      - application/json
+      parameters:
+      - name: Authorization
+        in: header
+        required: false
+        type: string
+        default: "Bearer {token}"
+      - name: batchId
+        in: query
+        description: ""
+        required: true
+        type: string
+      - name: pageNo
+        in: query
+        description: ""
+        required: true
+        type: string
+      - name: pageSize
+        in: query
+        description: ""
+        required: true
+        type: string
+      - name: User-Agent
+        in: header
+        description: ""
+        required: true
+        type: string
+      - name: Accept
+        in: header
+        description: ""
+        required: true
+        type: string
+      - name: Accept-Language
+        in: header
+        description: ""
+        required: true
+        type: string
+      - name: Platform-TenantId
+        in: header
+        description: ""
+        required: true
+        type: string
+      - name: Origin
+        in: header
+        description: ""
+        required: true
+        type: string
+      - name: Connection
+        in: header
+        description: ""
+        required: true
+        type: string
+      - name: Referer
+        in: header
+        description: ""
+        required: true
+        type: string
+      deprecated: false
+      responses:
+        "200":
+          description: ""
+          headers: {}
+securityDefinitions: {}
+definitions:
+  DepositMoneyCopyRequest:
+    type: object
+    required:
+    - amount
+    - creditParty
+    - currency
+    - type
+    properties:
+      amount:
+        type: string
+      type:
+        type: string
+      creditParty:
+        type: array
+        items:
+          $ref: '#/definitions/CreditParty'
+      currency:
+        type: string
+    title: DepositMoneyCopyRequest
+    example:
+      amount: "304"
+      type: transfer
+      creditParty:
+      - key: msisdn
+        value: 919900878571
+      currency: USD
+  CreditParty:
+    type: object
+    required:
+    - key
+    - value
+    properties:
+      key:
+        type: string
+      value:
+        type: string
+    title: CreditParty
+    example:
+      key: msisdn
+      value: 919900878571
+  CustomerSetPINRequest:
+    type: object
+    required:
+    - existingPin
+    - pin
+    properties:
+      existingPin:
+        type: string
+      pin:
+        type: string
+    title: CustomerSetPINRequest
+    example:
+      existingPin: String
+      pin: String
+  CustomerCreationRequest:
+    type: object
+    required:
+    - IdentifierId
+    - identifierType
+    properties:
+      identifierType:
+        type: string
+      IdentifierId:
+        type: string
+    title: CustomerCreationRequest
+    example:
+      identifierType: String
+      IdentifierId: String
+  TransferRequest:
+    type: object
+    required:
+    - amount
+    - payee
+    - payer
+    properties:
+      payer:
+        $ref: '#/definitions/Payer'
+      payee:
+        $ref: '#/definitions/Payee'
+      amount:
+        $ref: '#/definitions/Amount'
+    title: TransferRequest
+    example:
+      payer:
+        partyIdInfo:
+          partyIdType: MSISDN
+          partyIdentifier: "27710101999"
+      payee:
+        partyIdInfo:
+          partyIdType: MSISDN
+          partyIdentifier: "27710102999"
+      amount:
+        amount: 230
+        currency: TZS
+  Payer:
+    type: object
+    required:
+    - partyIdInfo
+    properties:
+      partyIdInfo:
+        $ref: '#/definitions/PartyIdInfo'
+    title: Payer
+    example:
+      partyIdInfo:
+        partyIdType: MSISDN
+        partyIdentifier: "27710101999"
+  PartyIdInfo:
+    type: object
+    required:
+    - partyIdType
+    - partyIdentifier
+    properties:
+      partyIdType:
+        type: string
+      partyIdentifier:
+        type: string
+    title: PartyIdInfo
+    example:
+      partyIdType: MSISDN
+      partyIdentifier: "27710101999"
+  Payee:
+    type: object
+    required:
+    - partyIdInfo
+    properties:
+      partyIdInfo:
+        $ref: '#/definitions/PartyIdInfo'
+    title: Payee
+    example:
+      partyIdInfo:
+        partyIdType: MSISDN
+        partyIdentifier: "27710102999"
+  Amount:
+    type: object
+    required:
+    - amount
+    - currency
+    properties:
+      amount:
+        type: integer
+        format: int32
+      currency:
+        type: string
+    title: Amount
+    example:
+      amount: 230
+      currency: TZS
+  TransferRequestRequest:
+    type: object
+    required:
+    - amount
+    - payee
+    - payer
+    properties:
+      payer:
+        $ref: '#/definitions/Payer'
+      payee:
+        $ref: '#/definitions/Payee'
+      amount:
+        $ref: '#/definitions/Amount'
+    title: TransferRequestRequest
+    example:
+      payer:
+        partyIdInfo:
+          partyIdType: MSISDN
+          partyIdentifier: "27710203999"
+      payee:
+        partyIdInfo:
+          partyIdType: MSISDN
+          partyIdentifier: "27710305999"
+      amount:
+        amount: 77
+        currency: TZS
+  PartyRegistrationRequest:
+    type: object
+    required:
+    - accountId
+    - idType
+    - idValue
+    properties:
+      accountId:
+        type: string
+      idType:
+        type: string
+      idValue:
+        type: string
+    title: PartyRegistrationRequest
+    example:
+      accountId: 9062b90de19b43989005
+      idType: EMAIL
+      idValue: test@test.hu
+  BilateralMoneyTransferRequest:
+    type: object
+    required:
+    - amount
+    - payee
+    - payer
+    properties:
+      payer:
+        $ref: '#/definitions/Payer'
+      payee:
+        $ref: '#/definitions/Payee'
+      amount:
+        $ref: '#/definitions/Amount'
+    title: BilateralMoneyTransferRequest
+    example:
+      payer:
+        partyIdInfo:
+          partyIdType: MSISDN
+          partyIdentifier: 449999999
+      payee:
+        partyIdInfo:
+          partyIdType: MSISDN
+          partyIdentifier: 449999112
+      amount:
+        amount: 6
+        currency: TZS
+  MerchantPayRequest:
+    type: object
+    required:
+    - amount
+    - payee
+    - payer
+    properties:
+      payer:
+        $ref: '#/definitions/Payer'
+      payee:
+        $ref: '#/definitions/Payee'
+      amount:
+        $ref: '#/definitions/Amount'
+    title: MerchantPayRequest
+    example:
+      payer:
+        partyIdInfo:
+          partyIdType: MSISDN
+          partyIdentifier: 449999999
+      payee:
+        partyIdInfo:
+          partyIdType: MSISDN
+          partyIdentifier: 449999112
+      amount:
+        amount: 6
+        currency: TZS
+  MerchantPaywithAuthCodeRequest:
+    type: object
+    required:
+    - amount
+    - payee
+    - payer
+    properties:
+      payer:
+        $ref: '#/definitions/Payer'
+      payee:
+        $ref: '#/definitions/Payee'
+      amount:
+        $ref: '#/definitions/Amount'
+    title: MerchantPaywithAuthCodeRequest
+    example:
+      payer:
+        partyIdInfo:
+          partyIdType: MSISDN
+          partyIdentifier: 449999999
+      payee:
+        partyIdInfo:
+          partyIdType: MSISDN
+          partyIdentifier: 449999112
+      amount:
+        amount: 6
+        currency: TZS
+  InternationalTransferRequest:
+    type: object
+    required:
+    - amount
+    - creditParty
+    - currency
+    - debitParty
+    - internationalTransferInformation
+    - receivingLei
+    - requestingLei
+    - type
+    properties:
+      amount:
+        type: string
+      type:
+        type: string
+      requestingLei:
+        type: string
+      receivingLei:
+        type: string
+      creditParty:
+        type: array
+        items:
+          $ref: '#/definitions/CreditParty'
+      currency:
+        type: string
+      debitParty:
+        type: array
+        items:
+          $ref: '#/definitions/DebitParty'
+      internationalTransferInformation:
+        $ref: '#/definitions/InternationalTransferInformation'
+    title: InternationalTransferRequest
+    example:
+      amount: "54"
+      type: transfer
+      requestingLei: ibank-usa
+      receivingLei: ibank-india
+      creditParty:
+      - key: msisdn
+        value: "919900878571"
+      currency: USD
+      debitParty:
+      - key: msisdn
+        value: "7543010"
+      internationalTransferInformation:
+        originCountry: US
+        receivingCountry: IN
+        receivingCurrency: INR
+        currencyPair: INR/USD
+  DebitParty:
+    type: object
+    required:
+    - key
+    - value
+    properties:
+      key:
+        type: string
+      value:
+        type: string
+    title: DebitParty
+    example:
+      key: msisdn
+      value: "7543010"
+  InternationalTransferInformation:
+    type: object
+    required:
+    - currencyPair
+    - originCountry
+    - receivingCountry
+    - receivingCurrency
+    properties:
+      originCountry:
+        type: string
+      receivingCountry:
+        type: string
+      receivingCurrency:
+        type: string
+      currencyPair:
+        type: string
+    title: InternationalTransferInformation
+    example:
+      originCountry: US
+      receivingCountry: IN
+      receivingCurrency: INR
+      currencyPair: INR/USD
+  DepositMoneyRequest:
+    type: object
+    required:
+    - amount
+    - creditParty
+    - currency
+    - type
+    properties:
+      amount:
+        type: string
+      type:
+        type: string
+      creditParty:
+        type: array
+        items:
+          $ref: '#/definitions/CreditParty'
+      currency:
+        type: string
+    title: DepositMoneyRequest
+    example:
+      amount: "304"
+      type: transfer
+      creditParty:
+      - key: msisdn
+        value: 919900878571
+      currency: USD

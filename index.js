@@ -25,6 +25,9 @@ const uploadapidefRoute = require("./routes/uploadapidef");
 const uploadapidef2Route = require("./routes/uploadapidef2");
 
 const explorerRoute = require("./routes/explorers");
+const chatbotexplorerrelRoute = require("./routes/chatbotexplorerrel");
+
+const workspaceRoute = require("./routes/workspaces");
 const yamlRoute = require("./routes/yamls");
 
 const workflowRoute = require("./routes/workflows");
@@ -66,6 +69,8 @@ app.use("/api/upload", uploadRoute);
 app.use("/api/uploadapidef", uploadapidefRoute);
 app.use("/api/uploadapidef2", uploadapidef2Route);
 app.use("/api/explorer", explorerRoute);
+app.use("/api/chatbotexplorerrel", chatbotexplorerrelRoute);
+app.use("/api/workspace", workspaceRoute);
 app.use("/api/yaml", yamlRoute);
 app.use("/api/workflow", workflowRoute);
 app.use("/api/product", productRoute);

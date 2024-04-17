@@ -1,0 +1,405 @@
+openapi: 3.0.1
+info:
+  title: Payment Hub ISO Connector Proxy Identifier API
+  version: Sprint 15.2
+  description: |
+    <details>
+    <summary>CHANGELOG</summary>
+    <p>
+    
+    ## 2023.03.31 - Sprint 14
+    ### Added
+    * Added GET /email_inquiry, /mobile_inquiry, and /other_inquiry endpoints
+    ## 2023.04.17 - Sprint 15.1
+    ### Added
+    * Provided Swagger definition for the API
+    ## 2023.04.17 - Sprint 15.2
+    ### Changed
+    * Changed API name in Swagger
+    ## 2023.04.19 - Sprint 15.3
+    ### Changed
+    * PKCS7 validated response from GIRO is being unpacked
+    * Unnecessary HTTP header `bic` removed from request
+    ### Added
+    * Schema definitions and examples provided
+    </p>
+    </details>
+servers:
+  - url: http://localhost:8080
+    description: Generated server url
+paths:
+  /email_inquiry:
+    get:
+      tags:
+        - inquiry
+      summary: Returns the alias information of the account belonging to the email address
+      operationId: getEmailInquiry
+      parameters:
+        - name: alias
+          example: mate2.havasi2@nosuchdomain.com
+          in: header
+          description: Email address
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Alias information response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NASAliasInformationResponse'
+              example:
+                sts:
+                prtry: '00'
+                addtlInf: OK
+                rpt:
+                  msgId: d5ba262a0419493ba5eec40a709c0daa
+                  creDtTm: 1681915871337
+                  id:
+                    mobNb: null
+                    emailAdr: mate2.havasi2@nosuchdomain.com
+                    iban: null
+                    othr: null
+                  aliasInformation:
+                    - mobNb: null
+                      emailAdr: mate2.havasi2@nosuchdomain.com
+                      othr: null
+                      finInstnId:
+                        bicfi: BINXHUH0
+                      customer:
+                        custCat:
+                          cd: P
+                        nm: '16'
+                        surNm: Company
+                      acct:
+                        iban: HU19999000093074854231423734
+                      chanl:
+                        bicfi: BINXHUH0
+                      creDtTm: 1681915871337
+                      regDtTm: 1681915871337
+        '404':
+          description: Account not found for the provided proxy identifier
+        '500':
+          description: Other, non-specified error happened
+  /mobile_inquiry:
+    get:
+      tags:
+        - inquiry
+      summary: Returns the alias information of the account belonging to the mobile number
+      operationId: getMobileInquiry
+      parameters:
+        - name: alias
+          example: +36-203456789
+          in: header
+          description: Mobile number
+          required: true
+          schema:
+            type: string
+            pattern: ^\+[0-9]{1,3}-[0-9]{1,30}$
+      responses:
+        '200':
+          description: Alias information response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NASAliasInformationResponse'
+              example:
+                sts:
+                  prtry: '00'
+                  addtlInf: OK
+                rpt:
+                  msgId: df1359df3ff441988c03d17e63d3b292
+                  creDtTm: 1681915897383
+                  id:
+                    mobNb: '888777666'
+                    emailAdr: null
+                    iban: null
+                    othr: null
+                  aliasInformation:
+                    - mobNb: '888777666'
+                      emailAdr: null
+                      othr: null
+                      finInstnId:
+                        bicfi: BINXHUH0
+                      customer:
+                        custCat:
+                          cd: P
+                        nm: '16'
+                        surNm: Company
+                      acct:
+                        iban: HU19999000093074854231423734
+                      chanl:
+                        bicfi: BINXHUH0
+                      creDtTm: 1681915897383
+                      regDtTm: 1681915897383
+        '404':
+          description: Account not found for the provided proxy identifier
+        '500':
+          description: Other, non-specified error happened
+  /other_inquiry:
+    get:
+      tags:
+        - inquiry
+      summary: Returns the alias information of the account belonging to the provided secondary identifier
+      operationId: getOtherInquiry
+      parameters:
+        - name: alias
+          example: TXID:HU8487654321
+          in: header
+          description: Identifier
+          required: true
+          schema:
+            type: string
+            pattern: ^((TXID\:HU[0-9]{10})|(TXNB\:HU[0-9]{8}))$
+      responses:
+        '200':
+          description: Alias information response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NASAliasInformationResponse'
+              examples:
+                Taxid:
+                  value:
+                    sts:
+                      prtry: '00'
+                      addtlInf: OK
+                    rpt:
+                      msgId: 15cd214ea6e34d5181e3e55f06d2e7dc
+                      creDtTm: 1681917916204
+                      id:
+                        mobNb: null
+                        emailAdr: null
+                        iban: null
+                        othr: 'TXID:HU8413723485'
+                      aliasInformation:
+                        - mobNb: null
+                          emailAdr: null
+                          othr: 'TXID:HU8413723485'
+                          finInstnId:
+                            bicfi: BINXHUH0
+                          customer:
+                            custCat:
+                              cd: P
+                            nm: '16'
+                            surNm: Company
+                          acct:
+                            iban: HU19999000093074854231423734
+                          chanl:
+                            bicfi: BINXHUH0
+                          creDtTm: 1681917916204
+                          regDtTm: 1681917916204
+                Taxnb:
+                  value:
+                    sts:
+                      prtry: '00'
+                      addtlInf: OK
+                    rpt:
+                      msgId: 15cd214ea6e34d5181e3e55f06d2e7dc
+                      creDtTm: 1681917916204
+                      id:
+                        mobNb: null
+                        emailAdr: null
+                        iban: null
+                        othr: 'TXNB:HU84137234'
+                      aliasInformation:
+                        - mobNb: null
+                          emailAdr: null
+                          othr: 'TXNB:HU84137234'
+                          finInstnId:
+                            bicfi: BINXHUH0
+                          customer:
+                            custCat:
+                              cd: P
+                            nm: '16'
+                            surNm: Company
+                          acct:
+                            iban: HU19999000093074854231423734
+                          chanl:
+                            bicfi: BINXHUH0
+                          creDtTm: 1681917916204
+                          regDtTm: 1681917916204
+        '404':
+          description: Account not found for the provided proxy identifier
+        '500':
+          description: Other, non-specified error happened
+components:
+  schemas:
+    AliasInformationResponse:
+      type: object
+      required:
+        - acct
+        - creDtTm
+        - customer
+        - finInstnId
+        - regDtTm
+      properties:
+        mobNb:
+          type: string
+          xml:
+            name: MobNb
+        emailAdr:
+          type: string
+          xml:
+            name: EmailAdr
+        othr:
+          type: string
+          xml:
+            name: Othr
+        finInstnId:
+          xml:
+            name: FinInstnId
+          $ref: '#/components/schemas/FinancialInstitutionIdentification'
+        customer:
+          xml:
+            name: Customer
+          $ref: '#/components/schemas/Customer'
+        acct:
+          xml:
+            name: Acct
+          $ref: '#/components/schemas/CustomerAccount'
+        chanl:
+          xml:
+            name: Chanl
+          $ref: '#/components/schemas/Channel'
+        creDtTm:
+          type: string
+          format: date-time
+          xml:
+            name: CreDtTm
+        regDtTm:
+          type: string
+          format: date-time
+          xml:
+            name: RegDtTm
+    CustomerCategory:
+      type: object
+      required:
+        - cd
+      properties:
+        cd:
+          type: string
+          xml:
+            name: Cd
+    Status:
+      type: object
+      required:
+        - addtlInf
+        - prtry
+      properties:
+        prtry:
+          type: string
+          xml:
+            name: Prtry
+        addtlInf:
+          type: string
+          xml:
+            name: AddtlInf
+    Customer:
+      type: object
+      required:
+        - custCat
+        - nm
+      properties:
+        custCat:
+          xml:
+            name: CustCat
+          $ref: '#/components/schemas/CustomerCategory'
+        nm:
+          type: string
+          xml:
+            name: Nm
+        surNm:
+          type: string
+          xml:
+            name: SurNm
+    FinancialInstitutionIdentification:
+      type: object
+      required:
+        - bicfi
+      properties:
+        bicfi:
+          type: string
+          xml:
+            name: BICFI
+    Report:
+      type: object
+      required:
+        - creDtTm
+        - id
+        - msgId
+      properties:
+        msgId:
+          type: string
+          xml:
+            name: MsgId
+        creDtTm:
+          type: string
+          format: date-time
+          xml:
+            name: CreDtTm
+        id:
+          xml:
+            name: Id
+          $ref: '#/components/schemas/Identification'
+        aliasInformation:
+          type: array
+          xml:
+            name: AliasInformation
+          items:
+            xml:
+              name: AliasInformation
+            $ref: '#/components/schemas/AliasInformationResponse'
+    Channel:
+      type: object
+      required:
+        - bicfi
+      properties:
+        bicfi:
+          type: string
+          xml:
+            name: BICFI
+    NASAliasInformationResponse:
+      type: object
+      required:
+        - sts
+      properties:
+        sts:
+          xml:
+            name: Sts
+          $ref: '#/components/schemas/Status'
+        rpt:
+          xml:
+            name: Rpt
+          $ref: '#/components/schemas/Report'
+      xml:
+        name: NASAliasInformationResponse
+    CustomerAccount:
+      type: object
+      required:
+        - iban
+      properties:
+        iban:
+          type: string
+          xml:
+            name: IBAN
+    Identification:
+      type: object
+      properties:
+        mobNb:
+          type: string
+          xml:
+            name: MobNb
+        emailAdr:
+          type: string
+          xml:
+            name: EmailAdr
+        iban:
+          type: string
+          xml:
+            name: IBAN
+        othr:
+          type: string
+          xml:
+            name: Othr

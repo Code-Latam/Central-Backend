@@ -1,0 +1,69 @@
+---
+openapi: 3.0.0
+info:
+  title: Swagger test api
+  description: This is the description of the test API
+  version: 1.0.0
+servers:
+- url: /
+tags:
+- name: test tag
+  description: This is a description of the tag
+paths:
+  /chatbots/query:
+    post:
+      summary: This is the description of the test API
+      operationId: 650e3b52d401228b0238278b
+      parameters:
+      - name: Content-Type
+        in: header
+        description: Value of Content-Type header
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+          default: application/json
+      - name: MyCustomHeader
+        in: header
+        description: Value of MyCustomHeader header
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+          default: MyCustomHeader value
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/chatbots_query_body'
+      responses:
+        "200":
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+components:
+  schemas:
+    Schema:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+      description: |
+        This is  test schema
+    chatbots_query_body:
+      type: object
+      properties:
+        chatbotKey:
+          type: string
+          default: chatbot1
+        chatbotMaster:
+          type: string
+          default: chatbot1
+        clientNr:
+          type: string
+          default: "111111"

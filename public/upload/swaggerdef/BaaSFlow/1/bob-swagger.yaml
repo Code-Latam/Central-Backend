@@ -1,0 +1,712 @@
+openapi: 3.0.3
+info:
+  title: BOB - API
+  description: |-
+    BOB API for Demo [API Description](https://baasflow.atlassian.net/wiki/spaces/BKD/pages/113180673/API+mapping)
+  version: 0.1.0
+servers:
+  - url: http://bob.example.com/api/v1
+tags:
+  - name: user details
+    description: User details operations
+  - name: savings transactions
+    description: Savings transactions operations
+paths:
+  /user:
+    get:
+      tags:
+        - user details
+      summary: Get information about the user
+      description: 'Retrieves basic user information. BOB validates both the id token and access token using the jwks endpoints provided by ForgeRock. BOB verifies that idtoken and access token matches. The id of the current user (persona) is extracted out from the provided id token.'
+      security:
+        - bearerAuth: []
+      operationId: getUser
+      responses:
+        '200':
+          $ref: '#/components/responses/User'
+    parameters:
+      - in: header
+        description: 'The ID Token of the user currently logged in'
+        name: idtoken
+        schema:
+          type: string
+          format: JWT
+        required: true
+  /partners:
+    parameters:
+      - in: header
+        description: 'The ID Token of the user currently logged in'
+        name: idtoken
+        schema:
+          type: string
+          format: JWT
+        required: true
+    get:
+      operationId: listPartners
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - partners
+      responses:
+        '200':
+          $ref: '#/components/responses/Partners'
+    post:
+      operationId: createPartner
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - partners
+      requestBody:
+        $ref: '#/components/requestBodies/PartnerCreate'
+      responses:
+        '201':
+          description: Created
+          content:
+            text/plain:
+              schema:
+                type: string
+  /partners/{partnerId}:
+    parameters:
+      - in: path
+        name: partnerId
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - in: header
+        description: 'The ID Token of the user currently logged in'
+        name: idtoken
+        schema:
+          type: string
+          format: JWT
+        required: true
+    get:
+      operationId: getPartner
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - partners
+      responses:
+        '200':
+          $ref: '#/components/responses/Partner'
+    patch:
+      operationId: updatePartner
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - partners
+      requestBody:
+        $ref: '#/components/requestBodies/PartnerUpdate'
+      responses:
+        '204':
+          description: Partner updated
+    delete:
+      security:
+        - bearerAuth: [ ]
+      operationId: deletePartner
+      tags:
+        - partners
+      responses:
+        '204':
+          description: Partner deleted
+  /loans/{loanId}:
+    parameters:
+      - in: path
+        name: loanId
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - in: header
+        description: 'The ID Token of the user currently logged in'
+        name: idtoken
+        schema:
+          type: string
+          format: JWT
+        required: true
+    get:
+      operationId: getLoan
+      security:
+        - bearerAuth: []
+      tags:
+        - loans
+      responses:
+        '200':
+          $ref: '#/components/responses/Loan'
+  /loans/{loanId}/transactions:
+    get:
+      tags:
+        - loan transactions
+      responses:
+        '200':
+          $ref: '#/components/responses/LoanTransactions'
+      summary: List of Loan transactions
+      operationId: getLoanTransactionsByAccount
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: loanId
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - in: query
+          name: page
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+        - in: query
+          name: size
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 50
+            default: 25
+        - in: header
+          description: 'The ID Token of the user currently logged in'
+          name: idtoken
+          schema:
+            type: string
+            format: JWT
+          required: true
+  /savings/{accountId}/transactions:
+    get:
+      tags:
+        - savings transactions
+      summary: List of transactions
+      operationId: getTransactionsByAccount
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: accountId
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - in: query
+          name: page
+          schema:
+            type: integer
+        - in: query
+          name: size
+          schema:
+            type: integer
+        - in: query
+          name: type
+          schema:
+            $ref: '#/components/schemas/TransactionType'
+        - in: query
+          name: partnerAccountIban
+          schema:
+            type: string
+        - in: query
+          name: minAmount
+          schema:
+            type: number
+        - in: query
+          name: maxAmount
+          schema:
+            type: number
+        - in: query
+          name: startDate
+          schema:
+            type: string
+            format: date
+        - in: query
+          name: endDate
+          schema:
+            type: string
+            format: date
+        - in: query
+          name: sort
+          schema:
+            type: string
+            example: 'date:desc'
+        - in: header
+          description: 'The ID Token of the user currently logged in'
+          name: idtoken
+          schema:
+            type: string
+            format: JWT
+          required: true
+      responses:
+        '200':
+          $ref: '#/components/responses/SavingsTransactions'
+    post:
+      tags:
+        - savings transactions
+      summary: Create a new transaction
+      operationId: createTransaction
+      security:
+        - bearerAuth: [ ]
+      parameters:
+        - in: path
+          name: accountId
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SavingsTransaction'
+      responses:
+        '200':
+          $ref: '#/components/responses/SavingTransactionCreateResponse'
+  /savings/{accountId}/transactions/{transactionId}:
+    delete:
+      tags:
+        - savings transactions
+      summary: Cancel a transaction
+      operationId: cancelTransaction
+      security:
+        - bearerAuth: [ ]
+      parameters:
+        - in: path
+          name: accountId
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: transactionId
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Transaction successfully canceled
+          content:
+            text/plain:
+              schema:
+                type: string
+        '400':
+          description: Error response
+          content:
+            text/plain:
+              schema:
+                type: string
+components:
+  securitySchemes:
+    bearerAuth:            # arbitrary name for the security scheme
+      type: http
+      scheme: bearer
+      bearerFormat: JWT    # optional, arbitrary value for documentation purposes
+  schemas:
+    Currency:
+      type: string
+      description: Currency ([ISO 4217 code](https://en.wikipedia.org/wiki/ISO_4217)) of the money amount.
+      pattern: ^[A-Z]{3}$
+      example: HUF
+    TransactionType:
+      type: string
+      enum:
+        - COMPLETED
+        - PENDING
+        - REJECTED
+      default: COMPLETED
+    IBAN:
+      type: string
+      description: International Bank Account Number
+      pattern: ^[A-Z]{2}[0-9]{2}[A-Z0-9]{4}[0-9]{7}([A-Z0-9]?){0,16}$
+      example: HU42117730161111101800000000
+    Customer:
+      type: object
+      description: An object that represents a customer.
+      required:
+        - uuid
+        - name
+        - shortName
+      additionalProperties: false
+      properties:
+        uuid:
+          type: string
+          format: uuid
+        name:
+          type: string
+          description: Company name of the customer.
+          example: "John Doe Korlátolt Felelősségű Társaság"
+        shortName:
+          type: string
+          description: Short company name of the customer.
+          example: "John Doe Kft."
+        aggregatedBalance:
+          type: number
+          description: Short company name of the customer.
+          example: "10500.12"
+        aggregatedBalanceCurrency:
+          $ref: '#/components/schemas/Currency'
+        accounts:
+          readOnly: true
+          description: List of accounts objects associated with the customer.
+          type: array
+          items:
+            $ref: '#/components/schemas/Account'
+        loans:
+          readOnly: true
+          description: List of loan objects associated with the customer.
+          type: array
+          items:
+            $ref: '#/components/schemas/LoanSummary'
+    User:
+      type: object
+      properties:
+        uuid:
+          type: string
+          format: uuid
+        firstName:
+          type: string
+          example: John
+        lastName:
+          type: string
+          example: James
+        personaId:
+          type: string
+          format: uuid
+        customer:
+          $ref: '#/components/schemas/Customer'
+      xml:
+        name: user
+    Account:
+      type: object
+      description: An object that represents an account.
+      required:
+        - uuid
+        - iban
+        - currency
+      properties:
+        uuid:
+          type: string
+          format: uuid
+        iban:
+          $ref: '#/components/schemas/IBAN'
+        currency:
+          $ref: '#/components/schemas/Currency'
+        name:
+          type: string
+          example: Savings Product Name
+        balance:
+          type: number
+          example: 123456789.12
+    LoanSummary:
+      type: object
+      description: An object that summarizes a loan.
+      properties:
+        uuid:
+          type: string
+          format: uuid
+        currency:
+          $ref: '#/components/schemas/Currency'
+        totalOutstandingAmount:
+          type: number
+          example: 703.12
+    Loan:
+      type: object
+      description: An object that represents a loan.
+      properties:
+        uuid:
+          type: string
+          format: uuid
+        currency:
+          $ref: '#/components/schemas/Currency'
+        principal:
+          type: number
+          example: 1000.12
+        interest:
+          type: number
+          example: 34.12
+        fees:
+          type: number
+          example: 10.0
+        penalties:
+          type: number
+          example: 5.1
+        totalAmount:
+          type: number
+          example: 1049.22
+        lastRepaymentDate:
+          type: string
+          format: date
+          example: '2023-08-27'
+        lastRepaymentAmount:
+          type: number
+          example: 34.12
+        nextRepaymentDate:
+          type: string
+          format: date
+          example: '2023-09-27'
+        nextRepaymentAmount:
+          type: number
+          example: 34.12
+        totalOutstandingAmount:
+          type: number
+          example: 703.12
+        totalPaidAmount:
+          type: number
+          example: 331.12
+        interestRate:
+          type: string
+          example: '3.4%'
+        dueBalance:
+          type: number
+          example: 206.12
+    LoanTransactions:
+      type: object
+      properties:
+        content:
+          type: array
+          items:
+            $ref: '#/components/schemas/LoanTransaction'
+        currentPage:
+          type: integer
+        totalElements:
+          type: integer
+    LoanTransaction:
+      type: object
+      properties:
+        amount:
+          type: number
+          example: 1245.67
+        currency:
+          $ref: '#/components/schemas/Currency'
+        date:
+          type: string
+          format: date
+          example: '2023-09-27'
+        reversed:
+          type: boolean
+        transactionType:
+          type: string
+          enum:
+            - DISBURSEMENT
+            - REPAYMENT
+            - CONTRA
+            - WAIVE_INTEREST
+            - REPAYMENT_AT_DISBURSEMENT
+            - WRITEOFF
+            - MARKED_FOR_RESCHEDULING
+            - RECOVERY_REPAYMENT
+            - WAIVE_CHARGES
+            - ACCRUAL
+            - INITIATE_TRANSFER
+            - APPROVE_TRANSFER
+            - WITHDRAW_TRANSFER
+            - REJECT_TRANSFER
+            - REFUND
+            - CHARGE_PAYMENT
+            - REFUND_FOR_ACTIVE_LOAN
+            - INCOME_POSTING
+            - CREDIT_BALANCE_REFUND
+            - MERCHANT_ISSUED_REFUND
+            - PAYOUT_REFUND
+            - GOODWILL_CREDIT
+            - CHARGE_REFUND
+            - CHARGEBACK
+            - CHARGE_ADJUSTMENT
+            - CHARGE_OFF
+            - DOWN_PAYMENT
+    SavingsTransactions:
+      type: object
+      properties:
+        content:
+          type: array
+          items:
+            $ref: '#/components/schemas/SavingsTransaction'
+        currentPage:
+          type: integer
+        totalElements:
+          type: integer
+    SavingsTransaction:
+      type: object
+      properties:
+        transactionId:
+          type: string
+        amount:
+          type: number
+          example: 1245.67
+        currency:
+          $ref: '#/components/schemas/Currency'
+        date:
+          type: string
+          format: date
+          example: '2023-09-27'
+        transactionType:
+          type: string
+          enum:
+            - DEPOSIT
+            - WITHDRAWAL
+            - INTEREST_POSTING
+            - WITHDRAWAL_FEE
+            - ANNUAL_FEE
+            - WAIVE_CHARGES
+            - PAY_CHARGE
+            - DIVIDEND_PAYOUT
+            - INITIATE_TRANSFER
+            - APPROVE_TRANSFER
+            - WITHDRAW_TRANSFER
+            - REJECT_TRANSFER
+            - WRITTEN_OFF
+            - OVERDRAFT_INTEREST
+            - WITHHOLD_TAX
+            - ESCHEAT
+            - AMOUNT_HOLD
+            - AMOUNT_RELEASE
+        partnerAccountIban:
+          $ref: '#/components/schemas/IBAN'
+        partnerLongName:
+          type: string
+          example: John Doe
+        information:
+          type: string
+          example: Pizza's price
+    Partner:
+      type: object
+      properties:
+        uuid:
+          type: string
+          format: uuid
+        name:
+          type: string
+          description: Partner name
+        shortName:
+          type: string
+          description: Partner short name
+        identifierType:
+          type: string
+          enum:
+            - IBANAccount
+            - BinXeMoneyAccount
+            - phoneNumber
+            - emailAddress
+            - taxIdNumber
+            - taxNumber
+        identifier:
+          type: string
+          description: Partner identifier by identifier type
+    PartnerCreate:
+      type: object
+      required:
+        - name
+        - shortName
+        - identifierType
+        - identifier
+      additionalProperties: false
+      properties:
+        name:
+          type: string
+          description: Partner name
+        shortName:
+          type: string
+          description: Partner short name
+        identifierType:
+          type: string
+          enum:
+            - IBANAccount
+            - BinXeMoneyAccount
+            - phoneNumber
+            - emailAddress
+            - taxIdNumber
+            - taxNumber
+        identifier:
+          type: string
+          description: Partner identifier by identifier type
+    PartnerUpdate:
+      type: object
+      additionalProperties: false
+      properties:
+        name:
+          type: string
+          description: Partner name
+        shortName:
+          type: string
+          description: Partner short name
+        identifier:
+          type: string
+          description: Partner identifier by identifier type
+    Partners:
+      description: A list of Partners.
+      type: array
+      items:
+        $ref: '#/components/schemas/Partner'
+    SavingTransactionCreateResponse:
+      type: object
+      properties:
+        transactionId:
+          type: string
+        groupStatus:
+          type: string
+        paymentInformationStatus:
+          type: string
+        transactionStatus:
+          type: string
+  requestBodies:
+    User:
+      description: List of user object
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/User'
+    SavingsTransaction:
+      description: A transaction
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/SavingsTransaction'
+    PartnerCreate:
+      description: Create Partner
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/PartnerCreate'
+    PartnerUpdate:
+      description: Update Partner
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/PartnerUpdate'
+  responses:
+    User:
+      description: User details
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/User'
+    Loan:
+      description: Loan details
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Loan'
+    LoanTransactions:
+      description: Loan transaction list for Loan Account
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/LoanTransactions'
+    Partner:
+      description: Partner details
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Partner'
+    Partners:
+      description: Partner list
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Partners'
+    SavingsTransactions:
+      description: Transaction list by Account
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/SavingsTransactions'
+    SavingTransactionCreateResponse:
+      description: An object that contains the response for createSavingTransaction
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/SavingTransactionCreateResponse'
