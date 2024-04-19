@@ -29,6 +29,7 @@ const chatbotexplorerrelRoute = require("./routes/chatbotexplorerrel");
 
 const workspaceRoute = require("./routes/workspaces");
 const yamlRoute = require("./routes/yamls");
+const invitationRoute = require("./routes/invitations");
 
 const workflowRoute = require("./routes/workflows");
 const productRoute = require("./routes/products");
@@ -72,6 +73,7 @@ app.use("/api/explorer", explorerRoute);
 app.use("/api/chatbotexplorerrel", chatbotexplorerrelRoute);
 app.use("/api/workspace", workspaceRoute);
 app.use("/api/yaml", yamlRoute);
+app.use("/api/invitation", invitationRoute);
 app.use("/api/workflow", workflowRoute);
 app.use("/api/product", productRoute);
 app.use("/api/task", taskRoute);
