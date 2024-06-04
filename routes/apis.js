@@ -22,6 +22,23 @@ router.post("/registercustom", async (req, res) => {
   }
 })
 
+router.post("/registerapiresult", async (req, res) => {
+  try {
+    const url = base_url + "/api/api/registerapiresult"
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(req.body)
+    });
+    const myresponse = await response.json();
+    res.status(response.status).json(myresponse);
+  } catch (err) {
+    res.status(500).json(err)
+  }
+})
+
 
 router.post("/deletecustom", async (req, res) => {
   try {
