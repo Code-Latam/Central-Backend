@@ -1,0 +1,41 @@
+{
+	"info": {
+		"_postman_id": "870c4697-f277-484e-9a84-0bc76a89252e",
+		"name": "Postman test collection",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "25749966",
+		"_collection_link": "https://red-comet-433941.postman.co/workspace/GWOCU-AI-APIS~53aa63a8-1984-4178-a967-3c9e513a2fb9/collection/25749966-870c4697-f277-484e-9a84-0bc76a89252e?action=share&source=collection_link&creator=25749966"
+	},
+	"item": [
+		{
+			"name": "Register client",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{   \"secretKey\": \"yabadabado\",\r\n    \"clientNr\": \"BaaSFlow\",\r\n    \"clientToken\": \"hellobaby\",\r\n    \"clientname\": \"BaaSFlow\",\r\n    \"email\": \"s@gwocu.com\",\r\n    \"password\":  \"Password01\",\r\n    \"gwoken\": \"false\",\r\n    \"endtoend\": \"false\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:10000/api/clients/register",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "10000",
+					"path": [
+						"api",
+						"clients",
+						"register"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
