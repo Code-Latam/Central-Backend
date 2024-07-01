@@ -40,8 +40,108 @@ router.post("/verifytoken", async (req, res) => {
   }
 })
 
+router.post("/generate-token", async (req, res) => {
+  try {
+    const url = base_url + "/api/invitation/generate-token";
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(req.body)
+    });
+    const myresponse = await response.json();
+    res.status(response.status).json(myresponse);
+  } catch (err) {
+    res.status(500).json(err)
+  }
+})
+
+router.post("/GetPublicInviteStatus", async (req, res) => {
+  try {
+    const url = base_url + "/api/invitation/GetPublicInviteStatus";
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(req.body)
+    });
+    const myresponse = await response.json();
+    res.status(response.status).json(myresponse);
+  } catch (err) {
+    res.status(500).json(err)
+  }
+})
+
+router.post("/SetPublicInviteStatus", async (req, res) => {
+  try {
+    const url = base_url + "/api/invitation/SetPublicInviteStatus";
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(req.body)
+    });
+    const myresponse = await response.json();
+    res.status(response.status).json(myresponse);
+  } catch (err) {
+    res.status(500).json(err)
+  }
+})
+
+router.post("/publiclogin", async (req, res) => {
+  try {
+    const url = base_url + "/api/invitation/publiclogin";
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(req.body)
+    });
+    const myresponse = await response.json();
+    res.status(response.status).json(myresponse);
+  } catch (err) {
+    res.status(500).json(err)
+  }
+})
 
 
+router.post("/registerpublicuser", async (req, res) => {
+  try {
+    const url = base_url + "/api/invitation/registerpublicuser";
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(req.body)
+    });
+    const myresponse = await response.json();
+    res.status(response.status).json(myresponse);
+  } catch (err) {
+    res.status(500).json(err)
+  }
+})
+
+router.post("/registerpublicemail", async (req, res) => {
+  try {
+    const url = base_url + "/api/invitation/registerpublicemail";
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(req.body)
+    });
+    const myresponse = await response.json();
+    res.status(response.status).json(myresponse);
+  } catch (err) {
+    res.status(500).json(err)
+  }
+})
 
 
 //delete invite
